@@ -80,11 +80,11 @@ public class ResXLSWorkbook extends XLSWorkbook {
 
 		Row row = sheet.createRow(sheet.getLastRowNum()+1);
 
-		System.out.println("resRow:"+(row.getRowNum()+1)+ " getParents:"+resRow.getParents()+" getName: "+resRow.getName()+" getPrices:"+resRow.getPrices());
+		System.out.println("resRow:"+(row.getRowNum()+1)+ " getParents:"+resRow.getParentsArrList()+" getNamesArrList: "+resRow.getNamesArrList());
 
-		addCell(row, 0, resRow.getParents());
-		addCell(row, 1, resRow.getName());
-		addCell(row, 2, resRow.getPrices());
+		addCell(row, 0, resRow.getParentsArrList().get(0));
+		addCell(row, 1, resRow.getNamesArrList().get(0));
+//		addCell(row, 2, resRow.getPrices());
 	}
 
 	public void addCell(Row row, Integer index, String value) {

@@ -1,0 +1,73 @@
+<!--
+	INS_BATCH_SIZE Количество записей в коммите
+	LOG_BATCH_COUNT_IN_LINE ; Количество коммитов, выводимых в лог в одной строке
+-->
+<Fb2PgSettings
+	FB_HOST = "192.168.1.200"
+	FB_PORT = "3050"
+	FB_DBNAME = "c:/project/base.fb/base_norm_36.fdb"
+	FB_USER = "sysdba"
+	FB_PASSWORD = "masterkey"
+	FB_ENCODING = "WIN1251"
+
+	PG_HOST = "192.168.1.167"
+	PG_PORT = "5432"
+	PG_DBNAME = "cas2"
+	PG_SCHEMA = "autobase_norm_37"
+	PG_USER = "cas2"
+	PG_PASSWORD = "insaneinmybrain"
+
+	INS_BATCH_SIZE = "2000"
+	LOG_BATCH_COUNT_IN_LINE = "5"
+>
+	<TABLES_TO_CONV>
+		<TABLE_TO_CONV name="fact">
+			<SQL><![CDATA[
+				SELECT num,name, CAST(null AS BLOB) AS picture, '' AS enabl FROM factory WHERE num<10
+			]]></SQL>
+		</TABLE_TO_CONV>
+		<!--<TABLE_TO_CONV name="factory">-->
+			<!--<SQL><![CDATA[-->
+				<!--SELECT num,name, CAST(null AS BLOB) AS picture, '' AS enabl FROM factory WHERE num<10-->
+			<!--]]></SQL>-->
+		<!--</TABLE_TO_CONV>-->
+		<!--<TABLE_TO_CONV name="family">-->
+			<!--<SQL><![CDATA[-->
+				 <!--SELECT * FROM family;-->
+			<!--]]></SQL>-->
+		<!--</TABLE_TO_CONV>-->
+		<!--<TABLE_TO_CONV name="ts_typ" />-->
+		<!--<TABLE_TO_CONV name="nmodels" />-->
+		<!--<TABLE_TO_CONV name="models" />-->
+		<!--<TABLE_TO_CONV name="modifs" />-->
+		<!--<TABLE_TO_CONV name="works_typ" />-->
+		<!--<TABLE_TO_CONV name="works" />-->
+		<!--<TABLE_TO_CONV name="normativ" />-->
+		<!--<TABLE_TO_CONV name="body" />-->
+		<!--<TABLE_TO_CONV name="brand" />-->
+		<!--<TABLE_TO_CONV name="edizmer" />-->
+		<!--<TABLE_TO_CONV name="ill1_tree" />-->
+		<!--<TABLE_TO_CONV name="ill2_tree" />-->
+		<!--<TABLE_TO_CONV name="oper" />-->
+		<!--<TABLE_TO_CONV name="paint_colors" />-->
+		<!--<TABLE_TO_CONV name="paint_typ_mat" />-->
+		<!--<TABLE_TO_CONV name="paint_mat" />-->
+		<!--<TABLE_TO_CONV name="paint_techno" />-->
+		<!--<TABLE_TO_CONV name="paint_techno_cont" />-->
+		<!--<TABLE_TO_CONV name="paint_typ" />-->
+		<!--<TABLE_TO_CONV name="rul2010_izn" />-->
+		<!--<TABLE_TO_CONV name="spares" />-->
+		<!--<TABLE_TO_CONV name="snomer_gr" />-->
+		<!--<TABLE_TO_CONV name="snomer" />-->
+		<!--<TABLE_TO_CONV name="sn_sp" />-->
+		<!--<TABLE_TO_CONV name="rem_acts_works" />-->
+		<!--<TABLE_TO_CONV name="spares_sq" />-->
+		<!--<TABLE_TO_CONV name="tehno_gr" />-->
+		<!--<TABLE_TO_CONV name="works_dl" />-->
+		<!--<TABLE_TO_CONV name="view1" />-->
+		<!--<TABLE_TO_CONV name="view2" />-->
+		<!--<TABLE_TO_CONV name="raions" />-->
+		<!--<TABLE_TO_CONV name="regions" />-->
+	</TABLES_TO_CONV>
+
+</Fb2PgSettings>

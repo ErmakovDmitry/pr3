@@ -75,5 +75,13 @@ public class FileName {
 		return filename.substring(dotPos);
 	}*/
 
-
+	@Override
+	public String toString() {
+		return "FileName{" +
+				"fullNameWithDir='" + fullNameWithDir + '\'' +
+				", fullNameWithoutDir='" + fullNameWithoutDir + '\'' +
+				", nameWithoutExtension='" + nameWithoutExtension + '\'' +
+				", extension='" + extension + '\'' +
+				'}';
+	}
 }

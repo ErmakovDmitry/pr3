@@ -1,5 +1,8 @@
 package pr3;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Колонка прайс-листа со сведениями, которые про нее удалось определить
  * Created by dmitry on 03.05.17.
@@ -67,6 +70,35 @@ public class PriceListColumn {
 
     public void setSemanticType(ColumnSemanticType semanticType) {
         this.semanticType = semanticType;
+    }
+
+    public void defineColumnSemanticType() {
+        if (semanticType == null) {
+            // Перебор семантических типов
+            for (ColumnSemanticType curSemanticType : ColumnSemanticType.values()) {
+                // Ключевые слова очередного семантического типа
+                List<String> keyWords = curSemanticType.getKeyWords();
+
+                if (keyWords != null) {
+                    // Перебор ключевых слов текущего семантического типа
+                    Iterator<String> keyWordsIterator = keyWords.iterator();
+                    while (keyWordsIterator.hasNext()) {
+                        String word = keyWordsIterator.next().toUpperCase();
+                        String cellVal = headerCellStrVal.toUpperCase();
+                        if (cellVal.contains(word)) {
+                            // Тип определен
+                            semanticType = curSemanticType;
+                            break;
+                        }
+                    }
+                    // Если тип определен - к следующему типу не переходим
+                    if (semanticType != null) {
+                        break;
+                    }
+                }
+            }
+
+        }
     }
 
     @Override

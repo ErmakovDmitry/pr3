@@ -37,12 +37,57 @@ public class App {
 
     }
 
+    /**
+     * Настройки программы
+     */
+//    public static Fb2PgSettings fb2PgSettings;
+
     public static void main(String[] args) throws Exception {
+        ColumnSemanticType.init();
 
-        ColumnSemanticType.NUMBER.setKeyWords(Arrays.asList("цена", "стоим"));
+//        String jarName = new java.io.File(FileName.class.getProtectionDomain()
+//                .getCodeSource()
+//                .getLocation()
+//                .getPath())
+//                .getName();
+//        System.out.println(jarName);
 
-        final String srcDirName = "/home/hddraid/TMP/5/";
+        if (args.length != 1) {
+            throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
+        }
+        System.out.println(args[0]);
+        FileName iniFileName = new FileName(args[0]); //"/home/me/IdeaProjects/cas/tool/fb2pg/fb2pg.ini";
+        System.out.println("pr3.jar is running with ini-file (" + iniFileName + ") ...");
+
+//        try {
+//
+//
+//            if (iniFileName.getExtension().equalsIgnoreCase("xml")) {
+//                // Загрузка настроек из xml-файла
+//                XmlIniFile xmlIniFile = new XmlIniFile();
+//                fb2PgSettings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Fb2PgSettings.class);
+//            } else if (iniFileName.getExtension().equalsIgnoreCase("ini")) {
+//                // Загрузка настроек из ini-файла
+//                IniFile iniFile = IniFile.load(iniFileName.getFullNameWithDir());
+//                fb2PgSettings = Fb2PgSettings.fromIniFile(iniFile);
+//            } else {
+//                throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml или ini, а не " + iniFileName.getExtension());
+//            }
+//
+//        } catch (XmlIniFileException | IniFileException e) {
+//            throw new RuntimeException(e.getLocalizedMessage());
+//        }
+//
+//
+//        // URL подключения к БД Firebird
+//        String fbUrl = fb2PgSettings.getFbUrl();
+//        System.out.println("\tFirebird base url '" + fbUrl + "'");
+
+
+
+//        final String srcDirName = "/home/hddraid/TMP/5/";
 //        final String srcDirName = "/Users/gbaum/Desktop/TMP/5/";
+        final String srcDirName = "C:\\Users\\Дмитрий\\TMP\\5\\";
         final String resFN = "res.xlsx";
 
         FileName resFileName = new FileName(srcDirName + resFN);
@@ -111,7 +156,7 @@ public class App {
         File[] srcFiles = srcDir.listFiles();
 
         for (File srcFile : srcFiles) {
-            FileName srcFileName = new FileName(srcDirName + srcFile.getName());
+            FileName srcFileName = new FileName(srcDirName + srcFile.getNamesArrList());
 
             if (!srcFile.isDirectory() &&
                     !srcFileName.getFullNameWithoutDir().equalsIgnoreCase(resFileName.getFullNameWithoutDir()) &&
@@ -141,7 +186,7 @@ public class App {
                 });
                 xlsParser.parseFile();
 
-                stat2.put(srcFile.getName(), stat.rowAdd);
+                stat2.put(srcFile.getNamesArrList(), stat.rowAdd);
             }
 //if (i==0) {
 //	break;
@@ -172,5 +217,221 @@ public class App {
         System.out.println(mes);
     }
 
+/*
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+Connection conn = null;
+...
+try {
+    conn =
+       DriverManager.getConnection("jdbc:mysql://localhost/test?" +
+                                   "user=minty&password=greatsqldb");
+
+    // Do something with the Connection
+
+   ...
+} catch (SQLException ex) {
+    // handle any errors
+    System.out.println("SQLException: " + ex.getMessage());
+    System.out.println("SQLState: " + ex.getSQLState());
+    System.out.println("VendorError: " + ex.getErrorCode());
+}
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+
+// assume that conn is an already created JDBC connection (see previous examples)
+
+Statement stmt = null;
+ResultSet rs = null;
+
+try {
+    stmt = conn.createStatement();
+    rs = stmt.executeQuery("SELECT foo FROM bar");
+
+    // or alternatively, if you don't know ahead of time that
+    // the query will be a SELECT...
+
+    if (stmt.execute("SELECT foo FROM bar")) {
+        rs = stmt.getResultSet();
+    }
+
+    // Now do something with the ResultSet ....
+}
+catch (SQLException ex){
+    // handle any errors
+    System.out.println("SQLException: " + ex.getMessage());
+    System.out.println("SQLState: " + ex.getSQLState());
+    System.out.println("VendorError: " + ex.getErrorCode());
+}
+finally {
+    // it is a good idea to release
+    // resources in a finally{} block
+    // in reverse-order of their creation
+    // if they are no-longer needed
+
+    if (rs != null) {
+        try {
+            rs.close();
+        } catch (SQLException sqlEx) { } // ignore
+
+        rs = null;
+    }
+
+    if (stmt != null) {
+        try {
+            stmt.close();
+        } catch (SQLException sqlEx) { } // ignore
+
+        stmt = null;
+    }
+}
+
+ */
+
+/*
+		try (
+
+			Connection fbConnection = fbDriver.connect(fbUrl, new Properties(){{
+				put("user_name", fb2PgSettings.getFbUser());
+				put("password", fb2PgSettings.getFbPassword());
+				put("encoding", fb2PgSettings.getFbEncoding());
+			}});
+
+			Connection pgConnection = pgDriver.connect(pgUrl, new Properties(){{
+				put("user", fb2PgSettings.getPgUser());
+				put("password", fb2PgSettings.getPgPassword());
+			}});
+
+		){
+
+			// Метка времени для лога
+			String timeStamp;
+
+			// Исходная база
+			DbFb srcDb  = new DbFb(fbConnection);
+			// Целевая база
+			DbPg destDb = new DbPg(pgConnection);
+
+			// Конвертер
+			Fb2PgConverter fb2PgConverter = new Fb2PgConverter();
+			fb2PgConverter.setInsBatchSize(fb2PgSettings.getInsBatchSize());
+			fb2PgConverter.setLogBatchCountInLine(fb2PgSettings.getLogBatchCountInLine());
+
+			if (!destDb.schemaExists(pgSchema)) {
+				throw new Fb2PgConverterException("Schema '" + pgSchema + "' does NOT exist in source base");
+			}
+
+			int success_count = 0;
+			int unsuccess_count = 0;
+
+			List<TableToConv> tablesToConvList = fb2PgSettings.getTablesToConvList();
+			for(TableToConv tableToConv : tablesToConvList) {
+
+//				String tblSql = tableToConv.getSql();
+//				System.out.println(tableToConv.getName() + "=> " + tblSql);
+//				if (tblSql != null) {
+//					System.out.println("SQL");
+//				} else {
+//					System.out.println("not SQL");
+//				}
+
+				// Спец. запрос, которые поставляет исходный набор данных вместо исходной таблицы
+				String specSelQuery = tableToConv.getSql();
+
+				String tableName = tableToConv.getName();
+
+				timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+				System.out.println("\n" + timeStamp + " table '" + tableName + "':");
+
+				Boolean success = false;
+
+				int srcTableRecCount = 0;
+				int destTableRecCount = 0;
+
+				// Проверка существования исходной таблицы в Firebird, если исходные данные не поставляются запросом
+				System.out.print("\tchecking existance in Firebird base ... ");
+				if ((specSelQuery !=null) || srcDb.tableExists(tableName)) {
+					System.out.println("OK");
+
+					// Проверка существования исходной таблицы в PostgreSQL
+					System.out.print("\tchecking existance in PostgreSQL base ... ");
+					if (destDb.tableExists(pgSchema, tableName)) {
+						System.out.println("OK");
+
+						DbTable srcTable = srcDb.getTable(tableName, specSelQuery);
+						DbTable destTable = destDb.getTable(pgSchema, tableName);
+
+						System.out.print("\tchecking field set compatibility ... ");
+
+						// log-сравнения полей
+						StringBuilder colSetLog = new StringBuilder();
+
+						// Проверка совместимости наборов полей в исходной и целевой таблицах
+						if (fb2PgConverter.columnSetsCompatible(srcTable, destTable, colSetLog)) {
+
+//							System.out.println();
+//							System.out.print(colSetLog);
+							System.out.println("OK");
+
+							// Очистка целевой таблицы
+							destTable.empty();
+
+							srcTableRecCount = srcTable.getRecordCount();
+							System.out.print("\tdata converting (" + srcTableRecCount + " records) ... ");
+
+							// Конвертация данных
+							fb2PgConverter.convTableData(srcTable, destTable);
+
+							// Наивная проверка результатов конвертации
+							destTableRecCount = destTable.getRecordCount();
+							if (destTableRecCount == srcTableRecCount) {
+								System.out.println("OK");
+								success = true;
+							} else {
+								System.out.println("\trecords count in PostgreSQL (" + destTableRecCount + ") NOT EQUAL records count in Firebird (" + srcTableRecCount + ")");
+							}
+
+						} else {
+							System.out.println("FAIL");
+							System.out.print(colSetLog);
+						}
+
+					} else {
+						System.out.println("FAIL");
+					}
+				} else {
+					System.out.println("FAIL");
+				}
+
+				if (success) {
+					timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+					System.out.println(timeStamp + " SUCCESS (" + destTableRecCount + " records converted)");
+					success_count++;
+				} else {
+					System.out.println("ERROR");
+					unsuccess_count++;
+				}
+			}
+
+			System.out.println("\nResult: " + success_count + " tables successfully converted; " + unsuccess_count + " tables NOT converted");
+
+		} catch (SQLException e) {
+			System.out.println("Error while connection to database: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (DbException e) {
+			System.out.println("Error while operating on database structure: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		} catch (Fb2PgConverterException e) {
+			System.out.println("Error while data converting: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+  */
 
 }
