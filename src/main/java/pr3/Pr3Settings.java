@@ -15,8 +15,8 @@ import java.util.Map;
  * Настройки программы-конвертера
  * Created by Ermakov Dmitry on 11/10/16.
  */
-@XmlRootElement(name = "Fb2PgSettings")
-public class Fb2PgSettings {
+@XmlRootElement(name = "Pr3Settings")
+public class Pr3Settings {
 
 	/**
 	 * Порт по-умолчанию для подключения к Firebird
@@ -37,6 +37,11 @@ public class Fb2PgSettings {
 	 * Количество выводов сведений об обработанном количестве записей в одну строку лога по-умолчанию
 	 */
 	public static final int DEFAULT_LOG_BATCH_COUNT_IN_LINE = 31 * DEFAULT_INS_BATCH_SIZE;
+
+	/**
+	 * Каталог с исходными xls-файлами
+	 */
+	private String srcDirName;
 
 	/**
 	 * Хост с БД Firebird
@@ -114,6 +119,15 @@ public class Fb2PgSettings {
 	 * Количество выводов сведений об обработанном количестве записей в одну строку лога
 	 */
 	private Integer logBatchCountInLine;
+
+	public String getSrcDirName() {
+		return srcDirName;
+	}
+
+	@XmlAttribute(name="SRC_DIR_NAME", required = true)
+	public void setSrcDirName(String srcDirName) {
+		this.srcDirName = srcDirName;
+	}
 
 	public String getFbHost() {
 		return fbHost;
@@ -283,7 +297,7 @@ public class Fb2PgSettings {
 
 	@Override
 	public String toString() {
-		return "Fb2PgSettings{\n" +
+		return "Pr3Settings{\n" +
 			"\tfbHost='" + fbHost + "'\n" +
 			"\tfbPort=" + fbPort + "\n" +
 			"\tfbDbName='" + fbDbName + "'\n" +
@@ -302,14 +316,14 @@ public class Fb2PgSettings {
 		'}';
 	}
 
-	public static Fb2PgSettings fromIniFile(IniFile iniFile) throws IniFileException {
-		Fb2PgSettings fb2PgSettings = new Fb2PgSettings();
-		for(Method method:Fb2PgSettings.class.getMethods()){
+	public static Pr3Settings fromIniFile(IniFile iniFile) throws IniFileException {
+		Pr3Settings pr3Settings = new Pr3Settings();
+		for(Method method: Pr3Settings.class.getMethods()){
 			XmlAttribute attribute = method.getAnnotation(XmlAttribute.class);
 			if(attribute!=null) {
 				Class<?>[] parameterTypes = method.getParameterTypes();
 				if(parameterTypes.length!=1){
-					throw new IniFileException("Method Fb2PgSettings."+method.getName()+" annotated as XmlAttribute \""+attribute.name()+"\" must be a setter with one parameter!");
+					throw new IniFileException("Method Pr3Settings."+method.getName()+" annotated as XmlAttribute \""+attribute.name()+"\" must be a setter with one parameter!");
 				}
 				Object value;
 
@@ -322,19 +336,19 @@ public class Fb2PgSettings {
 						value = iniFile.getIntegerProperty(attribute.name(), attribute.required());
 						break;
 					default:
-						throw new IniFileException("Method Fb2PgSettings."+method.getName()+" annotated as XmlAttribute \""+attribute.name()+"\" has unexpected parameter type "+parameterType.getCanonicalName());
+						throw new IniFileException("Method Pr3Settings."+method.getName()+" annotated as XmlAttribute \""+attribute.name()+"\" has unexpected parameter type "+parameterType.getCanonicalName());
 				}
 
 				try {
-					method.invoke(fb2PgSettings, value);
+					method.invoke(pr3Settings, value);
 				} catch (IllegalAccessException | InvocationTargetException e) {
-					throw new IniFileException("Invocation of method Fb2PgSettings."+method.getName()+", annotated as XmlAttribute \""+attribute.name()+"\", throws exception: "+e.getLocalizedMessage(), e);
+					throw new IniFileException("Invocation of method Pr3Settings."+method.getName()+", annotated as XmlAttribute \""+attribute.name()+"\", throws exception: "+e.getLocalizedMessage(), e);
 				}
 			}
 		}
 
-		fb2PgSettings.setTablesToConv(iniFile.getStringArrayProperty("TABLES_TO_CONV", true));
+		pr3Settings.setTablesToConv(iniFile.getStringArrayProperty("TABLES_TO_CONV", true));
 
-		return fb2PgSettings;
+		return pr3Settings;
 	}
 }

@@ -2,8 +2,6 @@ package pr3;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by dmitry on 25.04.17.
@@ -40,7 +38,7 @@ public class App {
     /**
      * Настройки программы
      */
-//    public static Fb2PgSettings fb2PgSettings;
+    public static Pr3Settings pr3Settings;
 
     public static void main(String[] args) throws Exception {
         ColumnSemanticType.init();
@@ -60,34 +58,31 @@ public class App {
         System.out.println("pr3.jar is running with ini-file (" + iniFileName + ") ...");
 
 //        try {
-//
-//
-//            if (iniFileName.getExtension().equalsIgnoreCase("xml")) {
-//                // Загрузка настроек из xml-файла
-//                XmlIniFile xmlIniFile = new XmlIniFile();
-//                fb2PgSettings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Fb2PgSettings.class);
-//            } else if (iniFileName.getExtension().equalsIgnoreCase("ini")) {
-//                // Загрузка настроек из ini-файла
-//                IniFile iniFile = IniFile.load(iniFileName.getFullNameWithDir());
-//                fb2PgSettings = Fb2PgSettings.fromIniFile(iniFile);
-//            } else {
-//                throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml или ini, а не " + iniFileName.getExtension());
-//            }
-//
-//        } catch (XmlIniFileException | IniFileException e) {
+
+            if (!iniFileName.getExtension().equalsIgnoreCase("xml")) {
+                throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml, а не " + iniFileName.getExtension());
+            }
+
+            // Загрузка настроек из xml-файла
+            XmlIniFile xmlIniFile = new XmlIniFile();
+            pr3Settings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Pr3Settings.class);
+
+//        } catch (XmlIniFileException e) {
 //            throw new RuntimeException(e.getLocalizedMessage());
 //        }
-//
-//
+
+
 //        // URL подключения к БД Firebird
-//        String fbUrl = fb2PgSettings.getFbUrl();
+//        String fbUrl = pr3Settings.getFbUrl();
 //        System.out.println("\tFirebird base url '" + fbUrl + "'");
 
 
 
 //        final String srcDirName = "/home/hddraid/TMP/5/";
 //        final String srcDirName = "/Users/gbaum/Desktop/TMP/5/";
-        final String srcDirName = "C:\\Users\\Дмитрий\\TMP\\5\\";
+//        final String srcDirName = "C:\\Users\\Дмитрий\\TMP\\5\\";
+        String srcDirName = pr3Settings.getSrcDirName();
+        System.out.println("!!!:"+srcDirName);
         final String resFN = "res.xlsx";
 
         FileName resFileName = new FileName(srcDirName + resFN);
@@ -299,14 +294,14 @@ finally {
 		try (
 
 			Connection fbConnection = fbDriver.connect(fbUrl, new Properties(){{
-				put("user_name", fb2PgSettings.getFbUser());
-				put("password", fb2PgSettings.getFbPassword());
-				put("encoding", fb2PgSettings.getFbEncoding());
+				put("user_name", pr3Settings.getFbUser());
+				put("password", pr3Settings.getFbPassword());
+				put("encoding", pr3Settings.getFbEncoding());
 			}});
 
 			Connection pgConnection = pgDriver.connect(pgUrl, new Properties(){{
-				put("user", fb2PgSettings.getPgUser());
-				put("password", fb2PgSettings.getPgPassword());
+				put("user", pr3Settings.getPgUser());
+				put("password", pr3Settings.getPgPassword());
 			}});
 
 		){
@@ -321,8 +316,8 @@ finally {
 
 			// Конвертер
 			Fb2PgConverter fb2PgConverter = new Fb2PgConverter();
-			fb2PgConverter.setInsBatchSize(fb2PgSettings.getInsBatchSize());
-			fb2PgConverter.setLogBatchCountInLine(fb2PgSettings.getLogBatchCountInLine());
+			fb2PgConverter.setInsBatchSize(pr3Settings.getInsBatchSize());
+			fb2PgConverter.setLogBatchCountInLine(pr3Settings.getLogBatchCountInLine());
 
 			if (!destDb.schemaExists(pgSchema)) {
 				throw new Fb2PgConverterException("Schema '" + pgSchema + "' does NOT exist in source base");
@@ -331,7 +326,7 @@ finally {
 			int success_count = 0;
 			int unsuccess_count = 0;
 
-			List<TableToConv> tablesToConvList = fb2PgSettings.getTablesToConvList();
+			List<TableToConv> tablesToConvList = pr3Settings.getTablesToConvList();
 			for(TableToConv tableToConv : tablesToConvList) {
 
 //				String tblSql = tableToConv.getSql();

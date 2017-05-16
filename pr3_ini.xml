@@ -2,7 +2,9 @@
 	INS_BATCH_SIZE Количество записей в коммите
 	LOG_BATCH_COUNT_IN_LINE ; Количество коммитов, выводимых в лог в одной строке
 -->
-<Fb2PgSettings
+<Pr3Settings
+	SRC_DIR_NAME = "C:\Users\Дмитрий\TMP\5\"
+
 	FB_HOST = "192.168.1.200"
 	FB_PORT = "3050"
 	FB_DBNAME = "c:/project/base.fb/base_norm_36.fdb"
@@ -70,4 +72,4 @@
 		<!--<TABLE_TO_CONV name="regions" />-->
 	</TABLES_TO_CONV>
 
-</Fb2PgSettings>
+</Pr3Settings>
