@@ -57,7 +57,7 @@ public class App {
         FileName iniFileName = new FileName(args[0]);
         // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
         // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
-        System.out.println("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
+        addToLog("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
 
 //        try {
 
@@ -74,8 +74,10 @@ public class App {
 //            throw new RuntimeException(e.getLocalizedMessage());
 //        }
 
-        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().getEnabled());
-        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().getFileName());
+        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().asString());
+        System.out.println("!!!!!!!:" + settings.getSettingsDbOut().asString());
+
+        DbMySql dbMySql = new DbMySql(settings.getSettingsDbOut());
 
         String srcDirName = settings.getSrcDirName();
         String xlsOutFileName = settings.getXlsOutFileName();

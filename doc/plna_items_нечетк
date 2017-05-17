@@ -1,0 +1,94 @@
+Table: plna_items
+Columns:
+plna_id bigint(20) UN AI PK
+plna_source_type  varchar(100)
+plna_source_id  int(11)
+plna_row_num  int(11)
+plna_parent_rows_list varchar(255)
+plna_diag_statcode  varchar(255)
+plna_date_from  date
+plna_date_to  date
+plna_item_text  text
+plna_item_text_extra  text
+plna_item_descr text
+plna_item_cat0  text
+plna_item_cat1  text
+plna_item_cat2  text
+plna_item_cat3  text
+plna_item_cat4  text
+plna_item_currency  varchar(10)
+plna_currency_rate  decimal(10,4)
+plna_vat_rate decimal(10,5)
+plna_units  varchar(50)
+plna_price_1  decimal(15,2)
+plna_price_rub_1  decimal(15,2)
+plna_price_many decimal(15,2)
+plna_price_rub_many decimal(15,2)
+plna_price_dealer decimal(15,2)
+plna_price_rub_dealer decimal(15,2)
+plna_price_dealer2  decimal(15,2)
+plna_price_rub_dealer2  decimal(15,2)
+plna_in_stock_state varchar(50)
+plna_discount_proc  decimal(10,2)
+plna_brand  varchar(50)
+plna_seller varchar(50)
+plna_article_code varchar(50)
+plna_article_type varchar(50)
+plna_article_code1  varchar(50)
+plna_item_code  varchar(50)
+plna_order_code varchar(50)
+plna_minimal_order  varchar(50)
+plna_minimal_order_sum  decimal(15,2)
+plna_part_num varchar(50)
+plna_extra_data text
+plna_sys_row_updated  int(11)
+
+
+CREATE TABLE `plna_items` (
+  `plna_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `plna_source_type` varchar(100) DEFAULT NULL,
+  `plna_source_id` int(11) DEFAULT NULL,
+  `plna_row_num` int(11) DEFAULT NULL,
+  `plna_parent_rows_list` varchar(255) DEFAULT NULL,
+  `plna_diag_statcode` varchar(255) DEFAULT NULL,
+  `plna_date_from` date DEFAULT NULL,
+  `plna_date_to` date DEFAULT NULL,
+  `plna_item_text` text,
+  `plna_item_text_extra` text,
+  `plna_item_descr` text,
+  `plna_item_cat0` text,
+  `plna_item_cat1` text,
+  `plna_item_cat2` text,
+  `plna_item_cat3` text,
+  `plna_item_cat4` text,
+  `plna_item_currency` varchar(10) DEFAULT NULL,
+  `plna_currency_rate` decimal(10,4) DEFAULT NULL,
+  `plna_vat_rate` decimal(10,5) DEFAULT NULL,
+  `plna_units` varchar(50) DEFAULT NULL,
+  `plna_price_1` decimal(15,2) DEFAULT NULL,
+  `plna_price_rub_1` decimal(15,2) DEFAULT NULL,
+  `plna_price_many` decimal(15,2) DEFAULT NULL,
+  `plna_price_rub_many` decimal(15,2) DEFAULT NULL,
+  `plna_price_dealer` decimal(15,2) DEFAULT NULL,
+  `plna_price_rub_dealer` decimal(15,2) DEFAULT NULL,
+  `plna_price_dealer2` decimal(15,2) DEFAULT NULL,
+  `plna_price_rub_dealer2` decimal(15,2) DEFAULT NULL,
+  `plna_in_stock_state` varchar(50) DEFAULT NULL,
+  `plna_discount_proc` decimal(10,2) DEFAULT NULL,
+  `plna_brand` varchar(50) DEFAULT NULL,
+  `plna_seller` varchar(50) DEFAULT NULL,
+  `plna_article_code` varchar(50) DEFAULT NULL COMMENT 'пишем код сюда всегда когда есть',
+  `plna_article_type` varchar(50) DEFAULT NULL COMMENT 'Сюда пишем тип кода - артикул, номер заказа, part no...',
+  `plna_article_code1` varchar(50) DEFAULT NULL,
+  `plna_item_code` varchar(50) DEFAULT NULL,
+  `plna_order_code` varchar(50) DEFAULT NULL,
+  `plna_minimal_order` varchar(50) DEFAULT NULL,
+  `plna_minimal_order_sum` decimal(15,2) DEFAULT NULL,
+  `plna_part_num` varchar(50) DEFAULT NULL,
+  `plna_extra_data` text,
+  `plna_sys_row_updated` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`plna_id`),
+  KEY `k01` (`plna_source_id`),
+  KEY `k03` (`plna_source_id`,`plna_row_num`),
+  FULLTEXT KEY `k02` (`plna_item_text`,`plna_item_text_extra`,`plna_item_cat0`,`plna_item_cat1`,`plna_item_cat2`,`plna_item_cat3`,`plna_brand`,`plna_seller`)
+) ENGINE=MyISAM AUTO_INCREMENT=654860 DEFAULT CHARSET=utf8 COMMENT='Прайс-листы БЕЗ четкой идентификации (артикула) - ПОЗИЦИИ';

@@ -14,22 +14,22 @@ public class Settings {
 	/**
 	 * Порт по-умолчанию для подключения к Firebird
 	 */
-	public static final int DEFAULT_FB_PORT = 3050;
+//	public static final int DEFAULT_FB_PORT = 3050;
 
 	/**
 	 * Порт по-умолчанию для подключения к PostgreSQL
 	 */
-	public static final int DEFAULT_PG_PORT = 5432;
+//	public static final int DEFAULT_PG_PORT = 5432;
 
 	/**
 	 * Количество записей по-умолчанию, добавляемых в таблицу за один раз
 	 */
-	public static final int DEFAULT_INS_BATCH_SIZE = 1000;
+//	public static final int DEFAULT_INS_BATCH_SIZE = 1000;
 
 	/**
 	 * Количество выводов сведений об обработанном количестве записей в одну строку лога по-умолчанию
 	 */
-	public static final int DEFAULT_LOG_BATCH_COUNT_IN_LINE = 31 * DEFAULT_INS_BATCH_SIZE;
+//	public static final int DEFAULT_LOG_BATCH_COUNT_IN_LINE = 31 * DEFAULT_INS_BATCH_SIZE;
 
 	/**
 	 * Каталог с исходными xls-файлами
@@ -46,7 +46,15 @@ public class Settings {
 	 */
 	private Boolean xlsOutEnabled;
 
+	/**
+	 * Настройки формирования выходного xls-файла
+	 */
 	private SettingsXlsOut settingsXlsOut;
+
+	/**
+	 * Настройки доступа к выходной базе
+	 */
+	private SettingsDbOut settingsDbOut;
 
 	public SettingsXlsOut getSettingsXlsOut() {
 		return settingsXlsOut;
@@ -56,6 +64,16 @@ public class Settings {
 	public void setSettingsXlsOut(SettingsXlsOut settingsXlsOut) {
 		this.settingsXlsOut = settingsXlsOut;
 	}
+
+	public SettingsDbOut getSettingsDbOut() {
+		return settingsDbOut;
+	}
+
+	@XmlElement(name="OUT_DB")
+	public void setSettingsDbOut(SettingsDbOut settingsDbOut) {
+		this.settingsDbOut = settingsDbOut;
+	}
+
 	//	/**
 //	 * Хост с БД Firebird
 //	 */

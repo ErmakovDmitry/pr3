@@ -1,0 +1,83 @@
+Columns:
+plwa_id	bigint(20) UN AI PK
+plwa_source_type	varchar(100)
+plwa_source_id	int(11)
+plwa_row_num	int(11)
+plwa_parent_rows_list	varchar(255)
+plwa_date_from	date
+plwa_date_to	date
+plwa_item_text	text
+plwa_item_text_extra	text
+plwa_item_descr	text
+plwa_item_cat0	text
+plwa_item_cat1	text
+plwa_item_cat2	text
+plwa_item_cat3	text
+plwa_item_currency	varchar(10)
+plwa_currency_rate	decimal(10,4)
+plwa_vat_rate	decimal(10,5)
+plwa_units	varchar(50)
+plwa_price_1	decimal(15,2)
+plwa_price_rub_1	decimal(15,2)
+plwa_price_many	decimal(15,2)
+plwa_price_rub_many	decimal(15,2)
+plwa_price_dealer	decimal(15,2)
+plwa_price_rub_dealer	decimal(15,2)
+plwa_price_dealer2	decimal(15,2)
+plwa_price_rub_dealer2	decimal(15,2)
+plwa_discount_proc	decimal(10,2)
+plwa_brand	varchar(50)
+plwa_seller	varchar(50)
+plwa_article_code	varchar(50)
+plwa_article_type	varchar(50)
+plwa_article_code1	varchar(50)
+plwa_item_code	varchar(50)
+plwa_order_code	varchar(50)
+plwa_part_num	varchar(50)
+plwa_extra_data	text
+plwa_sys_row_updated	int(11)
+
+
+
+CREATE TABLE `plwa_items` (
+  `plwa_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `plwa_source_type` varchar(100) DEFAULT NULL,
+  `plwa_source_id` int(11) DEFAULT NULL,
+  `plwa_row_num` int(11) DEFAULT NULL,
+  `plwa_parent_rows_list` varchar(255) DEFAULT NULL,
+  `plwa_date_from` date DEFAULT NULL,
+  `plwa_date_to` date DEFAULT NULL,
+  `plwa_item_text` text,
+  `plwa_item_text_extra` text,
+  `plwa_item_descr` text,
+  `plwa_item_cat0` text,
+  `plwa_item_cat1` text,
+  `plwa_item_cat2` text,
+  `plwa_item_cat3` text,
+  `plwa_item_currency` varchar(10) DEFAULT NULL,
+  `plwa_currency_rate` decimal(10,4) DEFAULT NULL,
+  `plwa_vat_rate` decimal(10,5) DEFAULT NULL,
+  `plwa_units` varchar(50) DEFAULT NULL,
+  `plwa_price_1` decimal(15,2) DEFAULT NULL,
+  `plwa_price_rub_1` decimal(15,2) DEFAULT NULL,
+  `plwa_price_many` decimal(15,2) DEFAULT NULL,
+  `plwa_price_rub_many` decimal(15,2) DEFAULT NULL,
+  `plwa_price_dealer` decimal(15,2) DEFAULT NULL,
+  `plwa_price_rub_dealer` decimal(15,2) DEFAULT NULL,
+  `plwa_price_dealer2` decimal(15,2) DEFAULT NULL,
+  `plwa_price_rub_dealer2` decimal(15,2) DEFAULT NULL,
+  `plwa_discount_proc` decimal(10,2) DEFAULT NULL,
+  `plwa_brand` varchar(50) DEFAULT NULL,
+  `plwa_seller` varchar(50) DEFAULT NULL,
+  `plwa_article_code` varchar(50) DEFAULT NULL COMMENT 'пишем код сюда всегда когда есть',
+  `plwa_article_type` varchar(50) DEFAULT NULL COMMENT 'Сюда пишем тип кода - артикул, номер заказа, part no...',
+  `plwa_article_code1` varchar(50) DEFAULT NULL,
+  `plwa_item_code` varchar(50) DEFAULT NULL,
+  `plwa_order_code` varchar(50) DEFAULT NULL,
+  `plwa_part_num` varchar(50) DEFAULT NULL,
+  `plwa_extra_data` text,
+  `plwa_sys_row_updated` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`plwa_id`),
+  KEY `k01` (`plwa_source_id`),
+  FULLTEXT KEY `k02` (`plwa_item_text`,`plwa_item_text_extra`,`plwa_item_cat0`,`plwa_item_cat1`,`plwa_item_cat2`,`plwa_item_cat3`,`plwa_brand`,`plwa_seller`)
+) ENGINE=MyISAM AUTO_INCREMENT=1832376 DEFAULT CHARSET=utf8 COMMENT='Прайс-листы БЕЗ четкой идентификации (артикула) - ПОЗИЦИИ';
