@@ -26,12 +26,6 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 	private String insCompanyName;
 
 	private String[] headerCells = {
-//		"Экономический  регион",
-//		"Марка ТС",
-//		"Легковые автомобили *",
-//		"Грузовые автомобили**",
-//		"Автобусы"
-
 		"Экономический  регион"
 		,"Марка ТС"
 		,"Количество СТОА"
@@ -42,8 +36,15 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 		,"Cредняя стоимость нормочаса, руб."
 	};
 
-	public SrcXLSWorkbook(FileName fileName) throws Exception {
+	/**
+	 * Локализация настроек программы
+	 */
+	private Settings settings;
+
+	public SrcXLSWorkbook(FileName fileName, Settings settings) throws Exception {
 		super(fileName);
+
+		this.settings = settings;
 
 		definePriceListParamsFromFileName(fileName.getNameWithoutExtension());
 
@@ -547,7 +548,10 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 
 				if (!resRow.allPricesNull()) {
 					System.out.println("resRow:" + resRow);
-					resXLSWorkbook.addRow(resRow);
+					// Если создана выходная xls-книга пишем в нее очередную строку
+					if (resXLSWorkbook != null) {
+						resXLSWorkbook.addRow(resRow);
+					}
 					System.out.println("--------------");
 					System.out.println();
 				}

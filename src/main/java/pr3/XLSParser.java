@@ -8,12 +8,29 @@ package pr3;
  */
 public class XLSParser {
 
+	/**
+	 * Xls-книга - источник данных
+	 */
 	private SrcXLSWorkbook srcWb;
-	private ResXLSWorkbook resWb;
 
-	public XLSParser(FileName resFileName, FileName srcFileName) throws Exception {
-		resWb = new ResXLSWorkbook(resFileName);
-		srcWb = new SrcXLSWorkbook(srcFileName);
+	/**
+	 * Выходная xls-книга
+	 */
+	private ResXLSWorkbook resWb = null;
+
+	/**
+	 * Локализация настроек программы
+	 */
+	private Settings settings;
+
+
+	public XLSParser(FileName resFileName, FileName srcFileName, Settings settings) throws Exception {
+		this.settings = settings;
+
+		srcWb = new SrcXLSWorkbook(srcFileName, settings);
+		if (settings.getXlsOutEnabled()) {
+			resWb = new ResXLSWorkbook(resFileName);
+		}
 	}
 
 	public SrcXLSWorkbook getSrcWb() {
@@ -22,7 +39,9 @@ public class XLSParser {
 
 	public void parseFile() throws Exception {
 		srcWb.parseWorkbook(resWb);
-		resWb.save();
+		if (resWb != null) {
+			resWb.save();
+		}
 	}
 
 

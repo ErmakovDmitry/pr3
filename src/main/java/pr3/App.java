@@ -38,7 +38,7 @@ public class App {
     /**
      * Настройки программы
      */
-    public static Pr3Settings pr3Settings;
+    public static Settings settings;
 
     public static void main(String[] args) throws Exception {
         ColumnSemanticType.init();
@@ -54,8 +54,10 @@ public class App {
             throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
         }
         System.out.println(args[0]);
-        FileName iniFileName = new FileName(args[0]); //"/home/me/IdeaProjects/cas/tool/fb2pg/fb2pg.ini";
-        System.out.println("pr3.jar is running with ini-file (" + iniFileName + ") ...");
+        FileName iniFileName = new FileName(args[0]);
+        // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
+        // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
+        System.out.println("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
 
 //        try {
 
@@ -65,30 +67,24 @@ public class App {
 
             // Загрузка настроек из xml-файла
             XmlIniFile xmlIniFile = new XmlIniFile();
-            pr3Settings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Pr3Settings.class);
+            settings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Settings.class);
+            addToLog(settings.asString());
 
 //        } catch (XmlIniFileException e) {
 //            throw new RuntimeException(e.getLocalizedMessage());
 //        }
 
+        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().getEnabled());
+        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().getFileName());
 
-//        // URL подключения к БД Firebird
-//        String fbUrl = pr3Settings.getFbUrl();
-//        System.out.println("\tFirebird base url '" + fbUrl + "'");
+        String srcDirName = settings.getSrcDirName();
+        String xlsOutFileName = settings.getXlsOutFileName();
+        addToLog("Выходной xls-файл:" + xlsOutFileName);
 
-
-
-//        final String srcDirName = "/home/hddraid/TMP/5/";
-//        final String srcDirName = "/Users/gbaum/Desktop/TMP/5/";
-//        final String srcDirName = "C:\\Users\\Дмитрий\\TMP\\5\\";
-        String srcDirName = pr3Settings.getSrcDirName();
-        System.out.println("!!!:"+srcDirName);
-        final String resFN = "res.xlsx";
-
-        FileName resFileName = new FileName(srcDirName + resFN);
+        FileName resFileName = new FileName(xlsOutFileName);
 
 //	    try {
-        addToLog("Старт ...");
+        addToLog("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
 
         // Рекурсивный перебор фйайлов в каталоге-источнике
         Files.find(
@@ -121,21 +117,22 @@ public class App {
                 return false;
             }
         ).forEach(path -> {
-            System.out.println("Обработка файла: "+path);
+            addToLog("Обработка файла: "+path);
             FileName srcFileName = null;
             try {
                 srcFileName = new FileName(path.toString());
-                XLSParser xlsParser = new XLSParser(resFileName, srcFileName);
+                XLSParser xlsParser = new XLSParser(resFileName, srcFileName, settings);
                 xlsParser.parseFile();
             } catch (Exception e) {
+                addToLog("Файл НЕ обработан, т.к. произошло исключение!");
                 addToLog(e);
                 e.printStackTrace();
-                System.out.println("Файл НЕ обработан");
             }
-            System.out.println("---------------------");
-            System.out.println("");
+
+            addToLog("---------------------------------------");
+            addToLog("Обработка файла: " + path + " закончена");
+            addToLog("");
         });
-//                .forEach(System.out::println);
 
 /*
         FileName resFileName = new FileName(srcDirName + resFN);
@@ -294,14 +291,14 @@ finally {
 		try (
 
 			Connection fbConnection = fbDriver.connect(fbUrl, new Properties(){{
-				put("user_name", pr3Settings.getFbUser());
-				put("password", pr3Settings.getFbPassword());
-				put("encoding", pr3Settings.getFbEncoding());
+				put("user_name", settings.getFbUser());
+				put("password", settings.getFbPassword());
+				put("encoding", settings.getFbEncoding());
 			}});
 
 			Connection pgConnection = pgDriver.connect(pgUrl, new Properties(){{
-				put("user", pr3Settings.getPgUser());
-				put("password", pr3Settings.getPgPassword());
+				put("user", settings.getPgUser());
+				put("password", settings.getPgPassword());
 			}});
 
 		){
@@ -316,8 +313,8 @@ finally {
 
 			// Конвертер
 			Fb2PgConverter fb2PgConverter = new Fb2PgConverter();
-			fb2PgConverter.setInsBatchSize(pr3Settings.getInsBatchSize());
-			fb2PgConverter.setLogBatchCountInLine(pr3Settings.getLogBatchCountInLine());
+			fb2PgConverter.setInsBatchSize(settings.getInsBatchSize());
+			fb2PgConverter.setLogBatchCountInLine(settings.getLogBatchCountInLine());
 
 			if (!destDb.schemaExists(pgSchema)) {
 				throw new Fb2PgConverterException("Schema '" + pgSchema + "' does NOT exist in source base");
@@ -326,7 +323,7 @@ finally {
 			int success_count = 0;
 			int unsuccess_count = 0;
 
-			List<TableToConv> tablesToConvList = pr3Settings.getTablesToConvList();
+			List<TableToConv> tablesToConvList = settings.getTablesToConvList();
 			for(TableToConv tableToConv : tablesToConvList) {
 
 //				String tblSql = tableToConv.getSql();

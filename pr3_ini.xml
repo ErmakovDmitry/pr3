@@ -3,7 +3,11 @@
 	LOG_BATCH_COUNT_IN_LINE ; Количество коммитов, выводимых в лог в одной строке
 -->
 <Pr3Settings
-	SRC_DIR_NAME = "C:\Users\Дмитрий\TMP\5\"
+	SRC_DIR_NAME = "/home/hddraid/TMP/5/"
+	SRC_DIR_NAME1 = "C:\Users\Дмитрий\TMP\5\"
+
+	XLS_OUT_ENABLED = "false"
+	XLS_OUT_FILE_NAME = "/home/hddraid/TMP/5/res.xlsx"
 
 	FB_HOST = "192.168.1.200"
 	FB_PORT = "3050"
@@ -22,6 +26,17 @@
 	INS_BATCH_SIZE = "2000"
 	LOG_BATCH_COUNT_IN_LINE = "5"
 >
+	<XLS_OUT
+		ENABLED = "false"
+		FILE_NAME = "/home/hddraid/TMP/5/res.xlsx">
+	</XLS_OUT>
+	<!-- Database configuration -->
+	<database
+			driver="sun.jdbc.odbc.JdbcOdbcDriver"
+			dataURL="jdbc:odbc:MyDatabase">
+		<prop name="user">user</prop>
+		<prop name="password">password</prop>
+	</database>
 	<TABLES_TO_CONV>
 		<TABLE_TO_CONV name="fact">
 			<SQL><![CDATA[
