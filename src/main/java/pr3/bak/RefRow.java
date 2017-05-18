@@ -1,11 +1,11 @@
-package pr3;
+package pr3.bak;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Dmitry Ermakov <de@ae-inf.ru>
  * Date: 3/3/14
  * Time: 5:19 PM
- * To change this template use File | Settings | File Templates.
+ * To change this template use File | IniValues | File Templates.
  */
 public class RefRow implements Cloneable {
 

@@ -1,4 +1,4 @@
-package pr3;
+package pr3.db;
 
 import java.time.LocalDate;
 
@@ -6,7 +6,7 @@ import java.time.LocalDate;
  * Строка таблицы plna_items
  * Created by Дмитрий on 17.05.2017.
  */
-public class DbRow {
+public class OutDbRow {
 
     private Integer plna_id; // bigint(20) UN AI PK
     private String plna_source_type; //  varchar(100)

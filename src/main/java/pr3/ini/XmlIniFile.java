@@ -1,4 +1,4 @@
-package pr3;
+package pr3.ini;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

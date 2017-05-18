@@ -1,4 +1,4 @@
-package pr3;
+package pr3.ini;
 
 /**
  * Created by Ermakov Dmitry on 11/10/16.

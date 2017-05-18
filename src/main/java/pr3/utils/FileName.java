@@ -1,11 +1,11 @@
-package pr3;
+package pr3.utils;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Dmitry Ermakov <de@ae-inf.ru>
  * Date: 3/5/14
  * Time: 10:00 AM
- * To change this template use File | Settings | File Templates.
+ * To change this template use File | IniValues | File Templates.
  */
 public class FileName {
 

@@ -1,5 +1,11 @@
 package pr3;
 
+import pr3.ini.IniValues;
+import pr3.utils.FileName;
+import pr3.xls.ColumnSemanticType;
+import pr3.xls.XLSParser;
+import pr3.ini.XmlIniFile;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -40,7 +46,7 @@ public class App {
     /**
      * Настройки программы
      */
-    public static Settings settings;
+    public static IniValues iniValues;
 
     public static void main(String[] args) throws Exception {
         ColumnSemanticType.init();
@@ -55,7 +61,7 @@ public class App {
         if (args.length != 1) {
             throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
         }
-        System.out.println(args[0]);
+
         FileName iniFileName = new FileName(args[0]);
         // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
         // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
@@ -69,23 +75,19 @@ public class App {
 
             // Загрузка настроек из xml-файла
             XmlIniFile xmlIniFile = new XmlIniFile();
-            settings = xmlIniFile.load(iniFileName.getFullNameWithDir(), Settings.class);
-            addToLog(settings.asString());
+            iniValues = xmlIniFile.load(iniFileName.getFullNameWithDir(), IniValues.class);
+            addToLog(iniValues.asString());
 
 //        } catch (XmlIniFileException e) {
 //            throw new RuntimeException(e.getLocalizedMessage());
 //        }
 
-        System.out.println("!!!!!!!:"+ settings.getSettingsXlsOut().asString());
-        System.out.println("!!!!!!!:" + settings.getSettingsDbOut().asString());
 
-        DbMySql dbMySql = new DbMySql(settings.getSettingsDbOut());
+//        String srcDirName = iniValues.getSrcDirName();
+        String srcDirName = iniValues.getIniValuesSrc().getDirName();
 
-        String srcDirName = settings.getSrcDirName();
-        String xlsOutFileName = settings.getXlsOutFileName();
-        addToLog("Выходной xls-файл:" + xlsOutFileName);
-
-        FileName resFileName = new FileName(xlsOutFileName);
+        FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
+        addToLog("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
 
 //	    try {
         addToLog("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
@@ -109,7 +111,7 @@ public class App {
                             // Отсеиваем временные файлы LibreOffice
                             && (! ".".equals(nameWithoutExtension.substring(0,1)))
                             // Проверка, что не пытаемся обрабатывать выходной файл
-                            && (!srcFileName.getFullNameWithoutDir().equalsIgnoreCase(resFileName.getFullNameWithoutDir()))
+                            && (!srcFileName.getFullNameWithoutDir().equalsIgnoreCase(xlsOutFileName.getFullNameWithoutDir()))
                             ) {
 
                             return true;
@@ -125,7 +127,7 @@ public class App {
             FileName srcFileName = null;
             try {
                 srcFileName = new FileName(path.toString());
-                XLSParser xlsParser = new XLSParser(srcFileName, resFileName, settings);
+                XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                 xlsParser.parseFile();
             } catch (Exception e) {
                 addToLog("Файл НЕ обработан, т.к. произошло исключение!");

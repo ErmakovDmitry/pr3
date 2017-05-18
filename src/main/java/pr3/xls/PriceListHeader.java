@@ -1,4 +1,4 @@
-package pr3;
+package pr3.xls;
 
 /**
  * Заголовок прайс-листа

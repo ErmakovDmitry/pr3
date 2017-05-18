@@ -1,12 +1,12 @@
-package pr3;
+package pr3.ini;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * Настройки достпа к базе данных
+ * Настройки доступа к базе данных
  * Created by Дмитрий on 17.05.2017.
  */
-public class SettingsDbOut {
+public class IniValuesOutDb {
 
     /**
      * Признак необходимости формирования выходного xls-файла
@@ -79,18 +79,18 @@ public class SettingsDbOut {
     }
 
     public String asString() {
-        return "SettingsDbOut{" +
-                "\n\tenabled=" + enabled +
-                "\n\tdriver='" + driver + '\'' +
-                "\n\turl='" + url + '\'' +
-                "\n\tuser='" + user + '\'' +
-                "\n\tpass='" + pass + '\'' +
-                "\n}";
+        return "IniValuesOutDb {" +
+                "\n\t\tenabled=" + enabled +
+                "\n\t\tdriver='" + driver + '\'' +
+                "\n\t\turl='" + url + '\'' +
+                "\n\t\tuser='" + user + '\'' +
+                "\n\t\tpass='" + pass + '\'' +
+                "\n\t}";
     }
 
     @Override
     public String toString() {
-        return "SettingsDbOut{" +
+        return "IniValuesOutDb{" +
                 "enabled=" + enabled +
                 ", driver='" + driver + '\'' +
                 ", url='" + url + '\'' +

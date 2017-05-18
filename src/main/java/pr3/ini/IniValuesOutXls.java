@@ -1,15 +1,12 @@
-package pr3;
+package pr3.ini;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Настройки доступа к xls-файлу
+ * Настройки доступа к выходному xls-файлу
  * Created by dmitry on 17.05.17.
  */
-public class SettingsXlsOut {
+public class IniValuesOutXls {
 
     /**
      * Признак необходимости формирования выходного xls-файла
@@ -40,15 +37,15 @@ public class SettingsXlsOut {
     }
 
     public String asString() {
-        return "SettingsXlsOut{" +
-                "\n\tenabled=" + enabled +
-                "\n\tfileName='" + fileName + '\'' +
-                "\n}";
+        return "IniValuesOutXls {" +
+                "\n\t\tenabled=" + enabled +
+                "\n\t\tfileName='" + fileName + '\'' +
+                "\n\t}";
     }
 
     @Override
     public String toString() {
-        return "SettingsXlsOut{" +
+        return "IniValuesOutXls{" +
                 "enabled=" + enabled +
                 ", fileName='" + fileName + '\'' +
                 '}';

@@ -1,9 +1,10 @@
-package pr3;
+package pr3.xls;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Workbook;
+import pr3.utils.FileName;
 
 import java.beans.PropertyChangeSupport;
 
@@ -20,7 +21,7 @@ public class XLSWorkbook {
 		return pcs;
 	}
 
-	public FileName  fileName;
+	public FileName fileName;
 	public Workbook  workbook;
 	public CellStyle commonCellStyle;
 

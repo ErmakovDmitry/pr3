@@ -1,8 +1,8 @@
-package pr3;
+package pr3.xls;
 
 import java.time.LocalDate;
 
-import static pr3.DateUtils.strToLocalDate;
+import static pr3.utils.DateUtils.strToLocalDate;
 
 /**
  * Параметры прайс-листа, определяемые из строки (имени файла), содержащей эти параметры в текстовом виде через разделитель

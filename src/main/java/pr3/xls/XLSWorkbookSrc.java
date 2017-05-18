@@ -1,4 +1,4 @@
-package pr3;
+package pr3.xls;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -7,6 +7,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pr3.bak.RefRow;
+import pr3.db.OutDb;
+import pr3.db.OutDbRow;
+import pr3.ini.IniValues;
+import pr3.utils.FileName;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -21,32 +26,32 @@ import java.util.*;
  * Date: 3/4/14
  * Time: 5:17 PM
  */
-public class SrcXLSWorkbook extends XLSWorkbook {
+public class XLSWorkbookSrc extends XLSWorkbook {
 
-	private String insCompanyName;
-
-	private String[] headerCells = {
-		"Экономический  регион"
-		,"Марка ТС"
-		,"Количество СТОА"
-		,"Cредняя стоимость нормочаса, руб."
-		,"Количество СТОА"
-		,"Cредняя стоимость нормочаса, руб."
-		,"Количество СТОА"
-		,"Cредняя стоимость нормочаса, руб."
-	};
+//	private String insCompanyName;
+//
+//	private String[] headerCells = {
+//		"Экономический  регион"
+//		,"Марка ТС"
+//		,"Количество СТОА"
+//		,"Cредняя стоимость нормочаса, руб."
+//		,"Количество СТОА"
+//		,"Cредняя стоимость нормочаса, руб."
+//		,"Количество СТОА"
+//		,"Cредняя стоимость нормочаса, руб."
+//	};
 
 	/**
 	 * Локализация настроек программы
 	 */
-	private Settings settings;
+	private IniValues iniValues;
 
-	public SrcXLSWorkbook(FileName fileName, Settings settings) throws Exception {
+	public XLSWorkbookSrc(FileName fileName, IniValues iniValues) throws Exception {
 		super(fileName);
 
-		this.settings = settings;
+		this.iniValues = iniValues;
 
-		definePriceListParamsFromFileName(fileName.getNameWithoutExtension());
+//		definePriceListParamsFromFileName(fileName.getNameWithoutExtension());
 
 		try {
 
@@ -89,15 +94,15 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 
 	/**
 	 * Парсинг xls-файла
-	 * @param resXLSWorkbook
+	 * @param XLSWorkbookOut
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseWorkbook(ResXLSWorkbook resXLSWorkbook, DbMySql resDb) throws Exception {
+	public void parseWorkbook(XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws Exception {
 
 		// Перебор листов xls-книги
 		for (int i = 0; i <  workbook.getNumberOfSheets(); i++) {
-			parseSheet(workbook.getSheetAt(i), resXLSWorkbook, resDb);
+			parseSheet(workbook.getSheetAt(i), XLSWorkbookOut, resDb);
 		}
 
 	}
@@ -105,11 +110,11 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 	/**
 	 * Парсинг одного листа рабочей книги
 	 * @param srcSheet
-	 * @param resXLSWorkbook
+	 * @param XLSWorkbookOut
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseSheet(Sheet srcSheet, ResXLSWorkbook resXLSWorkbook, DbMySql resDb) throws Exception {
+	public void parseSheet(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws Exception {
 		System.out.print("Лист " + srcSheet.getSheetName());
 
 		// Определяем размер строк с данными в виде количества заполненных ячеек
@@ -119,7 +124,7 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 		PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
 
 		// Обрабатываем строки данных
-		dataRowsProcessing(srcSheet, modaCellsCount, header, resXLSWorkbook, resDb);
+		dataRowsProcessing(srcSheet, modaCellsCount, header, XLSWorkbookOut, resDb);
 	}
 
 	/**
@@ -379,7 +384,7 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 		return header;
 	}
 
-	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, ResXLSWorkbook resXLSWorkbook, DbMySql resDb) {
+	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
 
 		System.out.println("dataRowsProcessing ////////////////////////////////////////////////////////////////");
 
@@ -551,17 +556,17 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 				if (!resRow.allPricesNull()) {
 					System.out.println("resRow:" + resRow);
 					// Если существует объект для выходной xls-книга, пишем в нее очередную строку
-					if (resXLSWorkbook != null) {
-						resXLSWorkbook.addRow(resRow);
+					if (XLSWorkbookOut != null) {
+						XLSWorkbookOut.addRow(resRow);
 					}
 
 					// Если существует объект для выходной базы, пишем в нее очередную строку
 					if (resDb != null) {
 						// Готовим запись для базы
-						DbRow dbRow = new DbRow();
-						dbRow.setPlna_item_text(resRow.getNamesArrList().get(0));
+						OutDbRow outDbRow = new OutDbRow();
+						outDbRow.setPlna_item_text(resRow.getNamesArrList().get(0));
 						// Сохраняем запись
-						resDb.ins(dbRow);
+						resDb.ins(outDbRow);
 					}
 					System.out.println("--------------");
 					System.out.println();
@@ -586,209 +591,209 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 	}
 
 
-	public void parseSheetOld(Sheet srcSheet, ResXLSWorkbook resXLSWorkbook) throws Exception {
-
-		Boolean headerFound = false;
-		Boolean cityColMissed = false; // Признак того, что в исходном файле отсутствует колонка "Населенный пункт"
-
-		// Ищем заголовок таблицы с ценами по названиям колонок с учетом их порядка
-		System.out.print("1) ищем заголовок ... ");
-
-		Row row;
-		Iterator<Row> it = srcSheet.iterator();
-
-		while (it.hasNext()) {
-			row = it.next();
-			Iterator<Cell> cells = row.iterator();
-			int cell_ind = 0;
-			Cell cell = null;
-			Boolean missCell= false;
-			while (cells.hasNext()) {
-				if (cell_ind >= headerCells.length) {
-					break;
-				}
-
-				if (!missCell) {
-					cell = cells.next();
-					System.out.println("cell " + cell.toString());
-				} else {
-					missCell= false;
-				}
-
-				if (cell != null) {
-					if (cell.toString().trim().contains(headerCells[cell_ind].trim())) { //equalsIgnoreCase
-						if (cell_ind == headerCells.length-1) {
-							headerFound = true;
-							break;
-						}
-//					} else if (headerCells[cell_ind].trim().equalsIgnoreCase("Населенный пункт")) {
-//						cityColMissed = true;
-//						missCell = true;
-					} else {
-						break;
-					}
-				}
-				cell_ind++;
-			}
-
-			if (headerFound) {
-				break;
-			}
-
-		}
-
-		if (headerFound) {
-			// Заголовок таблицы найден
-			System.out.println("найден");
-
-			// Список диапазонов объединенных ячеек
-			List<CellRangeAddress> regionsList = new ArrayList<CellRangeAddress>();
-			for(int i = 0; i < srcSheet.getNumMergedRegions(); i++) {
-				regionsList.add(srcSheet.getMergedRegion(i));
-			}
-
-			// Перебираем строки с данными
-			System.out.println("2) перебираем строки с данными ...");
-			int rowInd = 0;
-			RefRow preRefRow = new RefRow();
-			while (it.hasNext()) {
-				Boolean missRow = false; // Флаг пропуска строки, например, по причине ее несоответсвия формату
-				row = it.next();
-				System.out.println("стр. " + (row.getRowNum()+1) + ": ");
-				Iterator<Cell> cells = row.iterator();
-				String cellSrcVals = "";
-				int cellIndShift =0;
-				int cellInd = 0;
-				RefRow refRow = new RefRow();
-				Field[] rowFields = RefRow.class.getDeclaredFields();
-				while (cells.hasNext() && cellInd<rowFields.length) {
-//					System.out.println("!!!:"+rowFields[cellInd].getNamesArrList());
-					if (cityColMissed && (rowFields[cellInd].getName().equalsIgnoreCase("city"))) {
-						cellIndShift++;
-					}
-
-					Cell cell = cells.next();
-					cellInd = cell.getColumnIndex() + cellIndShift;
-
-					// Проверяем ячейку на вхождение в объединение
-					for(CellRangeAddress region : regionsList) {
-						if(region.isInRange(cell.getRowIndex(), cell.getColumnIndex())) {
-							// Берем первую ячейку объединенного диапазона
-							int rowNum = region.getFirstRow();
-							int colIndex = region.getFirstColumn();
-							cell = srcSheet.getRow(rowNum).getCell(colIndex);
-						}
-					}
-
-					int cellType = cell.getCellType();
-
-					if (cellSrcVals.trim().length() != 0) {
-						cellSrcVals = cellSrcVals + "; ";
-					}
-					cellSrcVals = cellSrcVals + cell.getColumnIndex() + "(" + rowFields[cellInd].getName() + ")=["+ cell.toString() + "]";
-
-					Field field = rowFields[cellInd];
-					Type fieldType = field.getType();
-
-//					System.out.println("cell "+cellInd+":'"+cell.toString()+"' cellType:"+cellType+" fieldName:"+field.getNamesArrList()+" fieldType:"+fieldType);
-
-					if (
-						((fieldType.equals(Integer.class) || fieldType.equals(Double.class)) && (cellType == Cell.CELL_TYPE_NUMERIC)) ||
-						(fieldType.equals(String.class) && ((cellType == Cell.CELL_TYPE_STRING)))
-						) {
-
-						if (fieldType.equals(Integer.class)) {
-							field.set(refRow, (int) cell.getNumericCellValue());
-						} else if (fieldType.equals(Double.class)) {
-							field.set(refRow, cell.getNumericCellValue());
-						} else if (fieldType.equals(String.class)) {
-							field.set(refRow, cell.getStringCellValue());
-						} else {
-							throw new Exception("для типа " + fieldType + " не определен способ конвертации значения");
-						}
-					} else if (fieldType.equals(Integer.class) && cellType == Cell.CELL_TYPE_STRING) {
-						// убираем из количества "шт", "шт.", " шт", " шт."
-						String s = cell.getStringCellValue();
-						Integer int_val;
-						try {
-							int_val = Integer.parseInt(s.replaceAll("шт\\.*", "").replace(",", ".").trim());
-						} catch (NumberFormatException e) {
-							int_val = new Integer(0);
-						}
-						field.set(refRow, int_val);
-					} else if (fieldType.equals(Double.class) && cellType == Cell.CELL_TYPE_STRING) {
-						Double dbl_val;
-						String s = cell.getStringCellValue();
-
-						// убираем из суммы "руб", "руб.", " руб", " руб."
-						s = s.replaceAll("руб\\.*", "").replace(",", ".").trim();
-
-						// убираем из суммы "от"
-						s = s.replaceAll("от", "").trim();
-
-						// Проверяем, не содержит ли ячейка диапазон цен через - или /
-						String[] parts = SplitUsingTokenizer(s, "-/");
-
-						if (parts.length == 2) {
-							try {
-								// Из диапазона делаем среднее
-								dbl_val = round((Double.parseDouble(parts[0]) + Double.parseDouble(parts[1])) / 2, 2);
-							} catch (NumberFormatException e) {
-								dbl_val = new Double(0);
-							}
-						} else {
-							try {
-								dbl_val = Double.parseDouble(s);
-							} catch (NumberFormatException e) {
-								dbl_val = new Double(0);
-							}
-						}
-
-						field.set(refRow, dbl_val);
-					} else if (fieldType.equals(Double.class) && cellType == Cell.CELL_TYPE_BLANK) {
-						field.set(refRow, 0d);
-					} else if (fieldType.equals(Integer.class) && cellType == Cell.CELL_TYPE_BLANK) {
-						field.set(refRow, 0);
-					} else if (fieldType.equals(String.class) && cellType == Cell.CELL_TYPE_BLANK) {
-						field.set(refRow, "");
-					} else {
-						missRow = true;
-						break;
-					}
-
-					cellInd++;
-				}
-//				System.out.println("cellSrcVals:"+cellSrcVals);
-
-				if (missRow == false && ((refRow.price_leg <= 0) && (refRow.price_gruz <= 0) && (refRow.price_avt <= 0))) {
-					missRow = true;
-				}
-
-				if (refRow.raion.trim().length() == 0) {
-					refRow.raion = preRefRow.raion;
-				}
-//				System.out.println("preRefRow:"+preRefRow);
-				System.out.println("refRow:"+refRow);
-
-				if (!missRow) {
-					pcs.firePropertyChange("rowAdd", null, refRow);
-					resXLSWorkbook.addRow(insCompanyName, refRow);
-				} else {
-					pcs.firePropertyChange("rowSkip", null, cellSrcVals);
-				}
-
-				preRefRow = (RefRow) refRow.clone();
-
-				System.out.println();
-
-				rowInd++;
-			}
-
-		} else {
-			System.out.println("не найден");
-		}
-
-	}
+//	public void parseSheetOld(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut) throws Exception {
+//
+//		Boolean headerFound = false;
+//		Boolean cityColMissed = false; // Признак того, что в исходном файле отсутствует колонка "Населенный пункт"
+//
+//		// Ищем заголовок таблицы с ценами по названиям колонок с учетом их порядка
+//		System.out.print("1) ищем заголовок ... ");
+//
+//		Row row;
+//		Iterator<Row> it = srcSheet.iterator();
+//
+//		while (it.hasNext()) {
+//			row = it.next();
+//			Iterator<Cell> cells = row.iterator();
+//			int cell_ind = 0;
+//			Cell cell = null;
+//			Boolean missCell= false;
+//			while (cells.hasNext()) {
+//				if (cell_ind >= headerCells.length) {
+//					break;
+//				}
+//
+//				if (!missCell) {
+//					cell = cells.next();
+//					System.out.println("cell " + cell.toString());
+//				} else {
+//					missCell= false;
+//				}
+//
+//				if (cell != null) {
+//					if (cell.toString().trim().contains(headerCells[cell_ind].trim())) { //equalsIgnoreCase
+//						if (cell_ind == headerCells.length-1) {
+//							headerFound = true;
+//							break;
+//						}
+////					} else if (headerCells[cell_ind].trim().equalsIgnoreCase("Населенный пункт")) {
+////						cityColMissed = true;
+////						missCell = true;
+//					} else {
+//						break;
+//					}
+//				}
+//				cell_ind++;
+//			}
+//
+//			if (headerFound) {
+//				break;
+//			}
+//
+//		}
+//
+//		if (headerFound) {
+//			// Заголовок таблицы найден
+//			System.out.println("найден");
+//
+//			// Список диапазонов объединенных ячеек
+//			List<CellRangeAddress> regionsList = new ArrayList<CellRangeAddress>();
+//			for(int i = 0; i < srcSheet.getNumMergedRegions(); i++) {
+//				regionsList.add(srcSheet.getMergedRegion(i));
+//			}
+//
+//			// Перебираем строки с данными
+//			System.out.println("2) перебираем строки с данными ...");
+//			int rowInd = 0;
+//			RefRow preRefRow = new RefRow();
+//			while (it.hasNext()) {
+//				Boolean missRow = false; // Флаг пропуска строки, например, по причине ее несоответсвия формату
+//				row = it.next();
+//				System.out.println("стр. " + (row.getRowNum()+1) + ": ");
+//				Iterator<Cell> cells = row.iterator();
+//				String cellSrcVals = "";
+//				int cellIndShift =0;
+//				int cellInd = 0;
+//				RefRow refRow = new RefRow();
+//				Field[] rowFields = RefRow.class.getDeclaredFields();
+//				while (cells.hasNext() && cellInd<rowFields.length) {
+////					System.out.println("!!!:"+rowFields[cellInd].getNamesArrList());
+//					if (cityColMissed && (rowFields[cellInd].getName().equalsIgnoreCase("city"))) {
+//						cellIndShift++;
+//					}
+//
+//					Cell cell = cells.next();
+//					cellInd = cell.getColumnIndex() + cellIndShift;
+//
+//					// Проверяем ячейку на вхождение в объединение
+//					for(CellRangeAddress region : regionsList) {
+//						if(region.isInRange(cell.getRowIndex(), cell.getColumnIndex())) {
+//							// Берем первую ячейку объединенного диапазона
+//							int rowNum = region.getFirstRow();
+//							int colIndex = region.getFirstColumn();
+//							cell = srcSheet.getRow(rowNum).getCell(colIndex);
+//						}
+//					}
+//
+//					int cellType = cell.getCellType();
+//
+//					if (cellSrcVals.trim().length() != 0) {
+//						cellSrcVals = cellSrcVals + "; ";
+//					}
+//					cellSrcVals = cellSrcVals + cell.getColumnIndex() + "(" + rowFields[cellInd].getName() + ")=["+ cell.toString() + "]";
+//
+//					Field field = rowFields[cellInd];
+//					Type fieldType = field.getType();
+//
+////					System.out.println("cell "+cellInd+":'"+cell.toString()+"' cellType:"+cellType+" fieldName:"+field.getNamesArrList()+" fieldType:"+fieldType);
+//
+//					if (
+//						((fieldType.equals(Integer.class) || fieldType.equals(Double.class)) && (cellType == Cell.CELL_TYPE_NUMERIC)) ||
+//						(fieldType.equals(String.class) && ((cellType == Cell.CELL_TYPE_STRING)))
+//						) {
+//
+//						if (fieldType.equals(Integer.class)) {
+//							field.set(refRow, (int) cell.getNumericCellValue());
+//						} else if (fieldType.equals(Double.class)) {
+//							field.set(refRow, cell.getNumericCellValue());
+//						} else if (fieldType.equals(String.class)) {
+//							field.set(refRow, cell.getStringCellValue());
+//						} else {
+//							throw new Exception("для типа " + fieldType + " не определен способ конвертации значения");
+//						}
+//					} else if (fieldType.equals(Integer.class) && cellType == Cell.CELL_TYPE_STRING) {
+//						// убираем из количества "шт", "шт.", " шт", " шт."
+//						String s = cell.getStringCellValue();
+//						Integer int_val;
+//						try {
+//							int_val = Integer.parseInt(s.replaceAll("шт\\.*", "").replace(",", ".").trim());
+//						} catch (NumberFormatException e) {
+//							int_val = new Integer(0);
+//						}
+//						field.set(refRow, int_val);
+//					} else if (fieldType.equals(Double.class) && cellType == Cell.CELL_TYPE_STRING) {
+//						Double dbl_val;
+//						String s = cell.getStringCellValue();
+//
+//						// убираем из суммы "руб", "руб.", " руб", " руб."
+//						s = s.replaceAll("руб\\.*", "").replace(",", ".").trim();
+//
+//						// убираем из суммы "от"
+//						s = s.replaceAll("от", "").trim();
+//
+//						// Проверяем, не содержит ли ячейка диапазон цен через - или /
+//						String[] parts = SplitUsingTokenizer(s, "-/");
+//
+//						if (parts.length == 2) {
+//							try {
+//								// Из диапазона делаем среднее
+//								dbl_val = round((Double.parseDouble(parts[0]) + Double.parseDouble(parts[1])) / 2, 2);
+//							} catch (NumberFormatException e) {
+//								dbl_val = new Double(0);
+//							}
+//						} else {
+//							try {
+//								dbl_val = Double.parseDouble(s);
+//							} catch (NumberFormatException e) {
+//								dbl_val = new Double(0);
+//							}
+//						}
+//
+//						field.set(refRow, dbl_val);
+//					} else if (fieldType.equals(Double.class) && cellType == Cell.CELL_TYPE_BLANK) {
+//						field.set(refRow, 0d);
+//					} else if (fieldType.equals(Integer.class) && cellType == Cell.CELL_TYPE_BLANK) {
+//						field.set(refRow, 0);
+//					} else if (fieldType.equals(String.class) && cellType == Cell.CELL_TYPE_BLANK) {
+//						field.set(refRow, "");
+//					} else {
+//						missRow = true;
+//						break;
+//					}
+//
+//					cellInd++;
+//				}
+////				System.out.println("cellSrcVals:"+cellSrcVals);
+//
+//				if (missRow == false && ((refRow.price_leg <= 0) && (refRow.price_gruz <= 0) && (refRow.price_avt <= 0))) {
+//					missRow = true;
+//				}
+//
+//				if (refRow.raion.trim().length() == 0) {
+//					refRow.raion = preRefRow.raion;
+//				}
+////				System.out.println("preRefRow:"+preRefRow);
+//				System.out.println("refRow:"+refRow);
+//
+//				if (!missRow) {
+//					pcs.firePropertyChange("rowAdd", null, refRow);
+//					XLSWorkbookOut.addRow(insCompanyName, refRow);
+//				} else {
+//					pcs.firePropertyChange("rowSkip", null, cellSrcVals);
+//				}
+//
+//				preRefRow = (RefRow) refRow.clone();
+//
+//				System.out.println();
+//
+//				rowInd++;
+//			}
+//
+//		} else {
+//			System.out.println("не найден");
+//		}
+//
+//	}
 
 	/**
 	 * Подсчет количества ячеек в строке с использованием итератора

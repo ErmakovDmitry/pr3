@@ -1,36 +1,37 @@
-package pr3;
+package pr3.db;
 
-import com.mysql.jdbc.*;
+import pr3.ini.IniValuesOutDb;
 
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.Statement;
 
 /**
+ * Выходная база данных
  * Created by Дмитрий on 17.05.2017.
  */
-public class DbMySql {
+public class OutDb {
 
     /**
      * Настройки подключения к базе
      */
-    private SettingsDbOut settingsDbOut;
+    private IniValuesOutDb iniValuesOutDb;
 
     // JDBC variables for opening and managing connection
     private Connection connection = null;
 
-    public DbMySql(SettingsDbOut settingsDbOut) {
-        this.settingsDbOut = settingsDbOut;
+    public OutDb(IniValuesOutDb iniValuesOutDb) {
+        this.iniValuesOutDb = iniValuesOutDb;
     }
 
     public Connection connect() throws ClassNotFoundException, SQLException {
         if (connection == null) {
 //            try {
-                Class.forName(settingsDbOut.getDriver());
+                Class.forName(iniValuesOutDb.getDriver());
                 connection = DriverManager.getConnection(
-                        settingsDbOut.getUrl()
-                        ,settingsDbOut.getUser()
-                        ,settingsDbOut.getPass()
+                        iniValuesOutDb.getUrl()
+                        , iniValuesOutDb.getUser()
+                        , iniValuesOutDb.getPass()
                 );
 //            } catch (ClassNotFoundException | SQLException e) {
 //                e.printStackTrace();
@@ -99,9 +100,9 @@ public class DbMySql {
         }
     }
 
-    public void ins(DbRow dbRow) {
+    public void ins(OutDbRow outDbRow) {
         String query = "INSERT INTO test.books (id, name, author) \n" +
-                " VALUES (3, '" + dbRow.getPlna_item_text() + "', 'Kathy Sieara');";
+                " VALUES (3, '" + outDbRow.getPlna_item_text() + "', 'Kathy Sieara');";
 
         System.out.println(query);
         // executing SELECT query
@@ -115,14 +116,14 @@ public class DbMySql {
 		try (
 
 			Connection fbConnection = fbDriver.connect(fbUrl, new Properties(){{
-				put("user_name", settings.getFbUser());
-				put("password", settings.getFbPassword());
-				put("encoding", settings.getFbEncoding());
+				put("user_name", ini.getFbUser());
+				put("password", ini.getFbPassword());
+				put("encoding", ini.getFbEncoding());
 			}});
 
 			Connection pgConnection = pgDriver.connect(pgUrl, new Properties(){{
-				put("user", settings.getPgUser());
-				put("password", settings.getPgPassword());
+				put("user", ini.getPgUser());
+				put("password", ini.getPgPassword());
 			}});
 
 		){
@@ -137,8 +138,8 @@ public class DbMySql {
 
 			// Конвертер
 			Fb2PgConverter fb2PgConverter = new Fb2PgConverter();
-			fb2PgConverter.setInsBatchSize(settings.getInsBatchSize());
-			fb2PgConverter.setLogBatchCountInLine(settings.getLogBatchCountInLine());
+			fb2PgConverter.setInsBatchSize(ini.getInsBatchSize());
+			fb2PgConverter.setLogBatchCountInLine(ini.getLogBatchCountInLine());
 
 			if (!destDb.schemaExists(pgSchema)) {
 				throw new Fb2PgConverterException("Schema '" + pgSchema + "' does NOT exist in source base");
@@ -147,7 +148,7 @@ public class DbMySql {
 			int success_count = 0;
 			int unsuccess_count = 0;
 
-			List<TableToConv> tablesToConvList = settings.getTablesToConvList();
+			List<TableToConv> tablesToConvList = ini.getTablesToConvList();
 			for(TableToConv tableToConv : tablesToConvList) {
 
 //				String tblSql = tableToConv.getSql();

@@ -1,4 +1,4 @@
-package pr3;
+package pr3.utils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;

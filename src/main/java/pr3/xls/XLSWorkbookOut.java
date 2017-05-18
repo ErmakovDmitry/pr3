@@ -1,10 +1,14 @@
-package pr3;
+package pr3.xls;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pr3.bak.RefRow;
+import pr3.utils.FileName;
+import pr3.xls.ResRow;
+import pr3.xls.XLSWorkbook;
 
 import java.io.*;
 
@@ -14,11 +18,11 @@ import java.io.*;
  * Date: 3/4/14
  * Time: 4:17 PM
  */
-public class ResXLSWorkbook extends XLSWorkbook {
+public class XLSWorkbookOut extends XLSWorkbook {
 
 	private Sheet sheet;
 
-	public ResXLSWorkbook(FileName fileName) throws Exception {
+	public XLSWorkbookOut(FileName fileName) throws Exception {
 		super(fileName);
 
 		try {

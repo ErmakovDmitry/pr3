@@ -1,4 +1,4 @@
-package pr3;
+package pr3.ini;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Настройки программы-конвертера
  * Created by Ermakov Dmitry on 11/10/16.
  */
-@XmlRootElement(name = "Pr3Settings")
-public class Settings {
+@XmlRootElement(name = "Pr3IniValues")
+public class IniValues {
 
 	/**
 	 * Порт по-умолчанию для подключения к Firebird
@@ -34,44 +34,58 @@ public class Settings {
 	/**
 	 * Каталог с исходными xls-файлами
 	 */
-	private String srcDirName;
+//	private String srcDirName;
 
 	/**
-	 * Выходной xls-файл
+	 * Настройки доступа к входному каталогу с xls-файлами
 	 */
-	private String xlsOutFileName;
-
-	/**
-	 * Признак необходимости формирования выходного xls-файла
-	 */
-	private Boolean xlsOutEnabled;
+	private	IniValuesSrc iniValuesSrc;
 
 	/**
 	 * Настройки формирования выходного xls-файла
 	 */
-	private SettingsXlsOut settingsXlsOut;
+	private IniValuesOutXls iniValuesOutXls;
 
 	/**
 	 * Настройки доступа к выходной базе
 	 */
-	private SettingsDbOut settingsDbOut;
+	private IniValuesOutDb iniValuesOutDb;
 
-	public SettingsXlsOut getSettingsXlsOut() {
-		return settingsXlsOut;
+
+//	public String getSrcDirName() {
+//		return srcDirName;
+//	}
+//
+//	@XmlAttribute(name="SRC_DIR_NAME", required = true)
+//	public void setSrcDirName(String srcDirName) {
+//		this.srcDirName = srcDirName;
+//	}
+
+	public IniValuesSrc getIniValuesSrc() {
+		return iniValuesSrc;
 	}
 
-	@XmlElement(name="XLS_OUT")
-	public void setSettingsXlsOut(SettingsXlsOut settingsXlsOut) {
-		this.settingsXlsOut = settingsXlsOut;
+	@XmlElement(name="Src")
+	public void setIniValuesSrc(IniValuesSrc iniValuesSrc) {
+		this.iniValuesSrc = iniValuesSrc;
 	}
 
-	public SettingsDbOut getSettingsDbOut() {
-		return settingsDbOut;
+	public IniValuesOutXls getIniValuesOutXls() {
+		return iniValuesOutXls;
 	}
 
-	@XmlElement(name="OUT_DB")
-	public void setSettingsDbOut(SettingsDbOut settingsDbOut) {
-		this.settingsDbOut = settingsDbOut;
+	@XmlElement(name="OutXls")
+	public void setIniValuesOutXls(IniValuesOutXls iniValuesOutXls) {
+		this.iniValuesOutXls = iniValuesOutXls;
+	}
+
+	public IniValuesOutDb getIniValuesOutDb() {
+		return iniValuesOutDb;
+	}
+
+	@XmlElement(name="OutDb")
+	public void setIniValuesOutDb(IniValuesOutDb iniValuesOutDb) {
+		this.iniValuesOutDb = iniValuesOutDb;
 	}
 
 	//	/**
@@ -151,32 +165,6 @@ public class Settings {
 //	 */
 //	private Integer logBatchCountInLine;
 
-	public String getSrcDirName() {
-		return srcDirName;
-	}
-
-	@XmlAttribute(name="SRC_DIR_NAME", required = true)
-	public void setSrcDirName(String srcDirName) {
-		this.srcDirName = srcDirName;
-	}
-
-	public String getXlsOutFileName() {
-		return xlsOutFileName;
-	}
-
-	@XmlAttribute(name="XLS_OUT_FILE_NAME", required = false)
-	public void setXlsOutFileName(String xlsOutFileName) {
-		this.xlsOutFileName = xlsOutFileName;
-	}
-
-	public Boolean getXlsOutEnabled() {
-		return xlsOutEnabled;
-	}
-
-	@XmlAttribute(name="XLS_OUT_ENABLED", required = false)
-	public void setXlsOutEnabled(Boolean xlsOutEnabled) {
-		this.xlsOutEnabled = xlsOutEnabled;
-	}
 
 //	public String getFbHost() {
 //		return fbHost;
@@ -345,19 +333,20 @@ public class Settings {
 //	}
 
 	public String asString() {
-		return "Settings {" +
-				"\n\t srcDirName='" + srcDirName + '\'' +
-				"\n\t xlsOutFileName='" + xlsOutFileName + '\'' +
-				"\n\t xlsOutEnabled=" + xlsOutEnabled +
+		return "IniValues {" +
+//				"\n\tsrcDirName='" + srcDirName + '\'' +
+				"\n\tiniValuesSrc=" + iniValuesSrc.asString() +
+				"\n\tiniValuesOutXls=" + iniValuesOutXls.asString() +
+				"\n\tiniValuesOutDb=" + iniValuesOutDb.asString() +
 				"\n}";
 	}
 
 	@Override
 	public String toString() {
-		return "Settings{" +
-				"srcDirName='" + srcDirName + '\'' +
-				", xlsOutFileName='" + xlsOutFileName + '\'' +
-				", xlsOutEnabled=" + xlsOutEnabled +
+		return "IniValues{" +
+//				"srcDirName='" + srcDirName + '\'' +
+				", iniValuesOutXls='" + iniValuesOutXls + '\'' +
+				", iniValuesOutDb=" + iniValuesOutDb +
 				'}';
 	}
 
