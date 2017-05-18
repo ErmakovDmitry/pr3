@@ -19,17 +19,30 @@ public class XLSParser {
 	private ResXLSWorkbook resWb = null;
 
 	/**
+	 * Выходная база
+	 */
+	private DbMySql resDb = null;
+
+	/**
 	 * Локализация настроек программы
 	 */
 	private Settings settings;
 
 
-	public XLSParser(FileName resFileName, FileName srcFileName, Settings settings) throws Exception {
+	public XLSParser(FileName srcFileName, FileName resFileName, Settings settings) throws Exception {
 		this.settings = settings;
 
 		srcWb = new SrcXLSWorkbook(srcFileName, settings);
+
 		if (settings.getXlsOutEnabled()) {
 			resWb = new ResXLSWorkbook(resFileName);
+		}
+
+		SettingsDbOut settingsDbOut = settings.getSettingsDbOut();
+		if (settingsDbOut.getEnabled()) {
+			resDb = new DbMySql(settingsDbOut);
+			resDb.connect();
+			resDb.sel();
 		}
 	}
 
@@ -38,9 +51,16 @@ public class XLSParser {
 	}
 
 	public void parseFile() throws Exception {
-		srcWb.parseWorkbook(resWb);
+
+		srcWb.parseWorkbook(resWb, resDb);
+
 		if (resWb != null) {
 			resWb.save();
+		}
+
+		if (resDb != null) {
+			resDb.disconnect();
+			resDb = null;
 		}
 	}
 

@@ -50,4 +50,12 @@ public class DbRow {
     private String plna_part_num; // varchar(50)
     private String plna_extra_data; // text
     private Integer plna_sys_row_updated; //  int(11)
+
+    public String getPlna_item_text() {
+        return plna_item_text;
+    }
+
+    public void setPlna_item_text(String plna_item_text) {
+        this.plna_item_text = plna_item_text;
+    }
 }

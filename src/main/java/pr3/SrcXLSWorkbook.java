@@ -90,13 +90,14 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 	/**
 	 * Парсинг xls-файла
 	 * @param resXLSWorkbook
+	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseWorkbook(ResXLSWorkbook resXLSWorkbook) throws Exception {
+	public void parseWorkbook(ResXLSWorkbook resXLSWorkbook, DbMySql resDb) throws Exception {
 
 		// Перебор листов xls-книги
 		for (int i = 0; i <  workbook.getNumberOfSheets(); i++) {
-			parseSheet(workbook.getSheetAt(i), resXLSWorkbook);
+			parseSheet(workbook.getSheetAt(i), resXLSWorkbook, resDb);
 		}
 
 	}
@@ -105,9 +106,10 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 	 * Парсинг одного листа рабочей книги
 	 * @param srcSheet
 	 * @param resXLSWorkbook
+	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseSheet(Sheet srcSheet, ResXLSWorkbook resXLSWorkbook) throws Exception {
+	public void parseSheet(Sheet srcSheet, ResXLSWorkbook resXLSWorkbook, DbMySql resDb) throws Exception {
 		System.out.print("Лист " + srcSheet.getSheetName());
 
 		// Определяем размер строк с данными в виде количества заполненных ячеек
@@ -117,7 +119,7 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 		PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
 
 		// Обрабатываем строки данных
-		dataRowsProcessing(srcSheet, modaCellsCount, header, resXLSWorkbook);
+		dataRowsProcessing(srcSheet, modaCellsCount, header, resXLSWorkbook, resDb);
 	}
 
 	/**
@@ -377,7 +379,7 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 		return header;
 	}
 
-	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, ResXLSWorkbook resXLSWorkbook) {
+	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, ResXLSWorkbook resXLSWorkbook, DbMySql resDb) {
 
 		System.out.println("dataRowsProcessing ////////////////////////////////////////////////////////////////");
 
@@ -548,9 +550,18 @@ public class SrcXLSWorkbook extends XLSWorkbook {
 
 				if (!resRow.allPricesNull()) {
 					System.out.println("resRow:" + resRow);
-					// Если создана выходная xls-книга пишем в нее очередную строку
+					// Если существует объект для выходной xls-книга, пишем в нее очередную строку
 					if (resXLSWorkbook != null) {
 						resXLSWorkbook.addRow(resRow);
+					}
+
+					// Если существует объект для выходной базы, пишем в нее очередную строку
+					if (resDb != null) {
+						// Готовим запись для базы
+						DbRow dbRow = new DbRow();
+						dbRow.setPlna_item_text(resRow.getNamesArrList().get(0));
+						// Сохраняем запись
+						resDb.ins(dbRow);
 					}
 					System.out.println("--------------");
 					System.out.println();

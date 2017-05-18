@@ -2,6 +2,8 @@ package pr3;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Created by dmitry on 25.04.17.
@@ -123,7 +125,7 @@ public class App {
             FileName srcFileName = null;
             try {
                 srcFileName = new FileName(path.toString());
-                XLSParser xlsParser = new XLSParser(resFileName, srcFileName, settings);
+                XLSParser xlsParser = new XLSParser(srcFileName, resFileName, settings);
                 xlsParser.parseFile();
             } catch (Exception e) {
                 addToLog("Файл НЕ обработан, т.к. произошло исключение!");
@@ -208,224 +210,8 @@ public class App {
     }
 
     private static void addToLog(String mes) {
-        System.out.println(mes);
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+        System.out.println(timeStamp + " " +mes);
     }
-
-/*
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-Connection conn = null;
-...
-try {
-    conn =
-       DriverManager.getConnection("jdbc:mysql://localhost/test?" +
-                                   "user=minty&password=greatsqldb");
-
-    // Do something with the Connection
-
-   ...
-} catch (SQLException ex) {
-    // handle any errors
-    System.out.println("SQLException: " + ex.getMessage());
-    System.out.println("SQLState: " + ex.getSQLState());
-    System.out.println("VendorError: " + ex.getErrorCode());
-}
-
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
-
-// assume that conn is an already created JDBC connection (see previous examples)
-
-Statement stmt = null;
-ResultSet rs = null;
-
-try {
-    stmt = conn.createStatement();
-    rs = stmt.executeQuery("SELECT foo FROM bar");
-
-    // or alternatively, if you don't know ahead of time that
-    // the query will be a SELECT...
-
-    if (stmt.execute("SELECT foo FROM bar")) {
-        rs = stmt.getResultSet();
-    }
-
-    // Now do something with the ResultSet ....
-}
-catch (SQLException ex){
-    // handle any errors
-    System.out.println("SQLException: " + ex.getMessage());
-    System.out.println("SQLState: " + ex.getSQLState());
-    System.out.println("VendorError: " + ex.getErrorCode());
-}
-finally {
-    // it is a good idea to release
-    // resources in a finally{} block
-    // in reverse-order of their creation
-    // if they are no-longer needed
-
-    if (rs != null) {
-        try {
-            rs.close();
-        } catch (SQLException sqlEx) { } // ignore
-
-        rs = null;
-    }
-
-    if (stmt != null) {
-        try {
-            stmt.close();
-        } catch (SQLException sqlEx) { } // ignore
-
-        stmt = null;
-    }
-}
-
- */
-
-/*
-		try (
-
-			Connection fbConnection = fbDriver.connect(fbUrl, new Properties(){{
-				put("user_name", settings.getFbUser());
-				put("password", settings.getFbPassword());
-				put("encoding", settings.getFbEncoding());
-			}});
-
-			Connection pgConnection = pgDriver.connect(pgUrl, new Properties(){{
-				put("user", settings.getPgUser());
-				put("password", settings.getPgPassword());
-			}});
-
-		){
-
-			// Метка времени для лога
-			String timeStamp;
-
-			// Исходная база
-			DbFb srcDb  = new DbFb(fbConnection);
-			// Целевая база
-			DbPg destDb = new DbPg(pgConnection);
-
-			// Конвертер
-			Fb2PgConverter fb2PgConverter = new Fb2PgConverter();
-			fb2PgConverter.setInsBatchSize(settings.getInsBatchSize());
-			fb2PgConverter.setLogBatchCountInLine(settings.getLogBatchCountInLine());
-
-			if (!destDb.schemaExists(pgSchema)) {
-				throw new Fb2PgConverterException("Schema '" + pgSchema + "' does NOT exist in source base");
-			}
-
-			int success_count = 0;
-			int unsuccess_count = 0;
-
-			List<TableToConv> tablesToConvList = settings.getTablesToConvList();
-			for(TableToConv tableToConv : tablesToConvList) {
-
-//				String tblSql = tableToConv.getSql();
-//				System.out.println(tableToConv.getName() + "=> " + tblSql);
-//				if (tblSql != null) {
-//					System.out.println("SQL");
-//				} else {
-//					System.out.println("not SQL");
-//				}
-
-				// Спец. запрос, которые поставляет исходный набор данных вместо исходной таблицы
-				String specSelQuery = tableToConv.getSql();
-
-				String tableName = tableToConv.getName();
-
-				timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-				System.out.println("\n" + timeStamp + " table '" + tableName + "':");
-
-				Boolean success = false;
-
-				int srcTableRecCount = 0;
-				int destTableRecCount = 0;
-
-				// Проверка существования исходной таблицы в Firebird, если исходные данные не поставляются запросом
-				System.out.print("\tchecking existance in Firebird base ... ");
-				if ((specSelQuery !=null) || srcDb.tableExists(tableName)) {
-					System.out.println("OK");
-
-					// Проверка существования исходной таблицы в PostgreSQL
-					System.out.print("\tchecking existance in PostgreSQL base ... ");
-					if (destDb.tableExists(pgSchema, tableName)) {
-						System.out.println("OK");
-
-						DbTable srcTable = srcDb.getTable(tableName, specSelQuery);
-						DbTable destTable = destDb.getTable(pgSchema, tableName);
-
-						System.out.print("\tchecking field set compatibility ... ");
-
-						// log-сравнения полей
-						StringBuilder colSetLog = new StringBuilder();
-
-						// Проверка совместимости наборов полей в исходной и целевой таблицах
-						if (fb2PgConverter.columnSetsCompatible(srcTable, destTable, colSetLog)) {
-
-//							System.out.println();
-//							System.out.print(colSetLog);
-							System.out.println("OK");
-
-							// Очистка целевой таблицы
-							destTable.empty();
-
-							srcTableRecCount = srcTable.getRecordCount();
-							System.out.print("\tdata converting (" + srcTableRecCount + " records) ... ");
-
-							// Конвертация данных
-							fb2PgConverter.convTableData(srcTable, destTable);
-
-							// Наивная проверка результатов конвертации
-							destTableRecCount = destTable.getRecordCount();
-							if (destTableRecCount == srcTableRecCount) {
-								System.out.println("OK");
-								success = true;
-							} else {
-								System.out.println("\trecords count in PostgreSQL (" + destTableRecCount + ") NOT EQUAL records count in Firebird (" + srcTableRecCount + ")");
-							}
-
-						} else {
-							System.out.println("FAIL");
-							System.out.print(colSetLog);
-						}
-
-					} else {
-						System.out.println("FAIL");
-					}
-				} else {
-					System.out.println("FAIL");
-				}
-
-				if (success) {
-					timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-					System.out.println(timeStamp + " SUCCESS (" + destTableRecCount + " records converted)");
-					success_count++;
-				} else {
-					System.out.println("ERROR");
-					unsuccess_count++;
-				}
-			}
-
-			System.out.println("\nResult: " + success_count + " tables successfully converted; " + unsuccess_count + " tables NOT converted");
-
-		} catch (SQLException e) {
-			System.out.println("Error while connection to database: " + e.getLocalizedMessage());
-			e.printStackTrace();
-		} catch (DbException e) {
-			System.out.println("Error while operating on database structure: " + e.getLocalizedMessage());
-			e.printStackTrace();
-		} catch (Fb2PgConverterException e) {
-			System.out.println("Error while data converting: " + e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-  */
 
 }
