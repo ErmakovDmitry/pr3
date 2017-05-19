@@ -2,46 +2,29 @@ package pr3;
 
 import pr3.ini.IniValues;
 import pr3.utils.FileName;
+import pr3.utils.FileNameException;
 import pr3.xls.ColumnSemanticType;
 import pr3.xls.XLSParser;
 import pr3.ini.XmlIniFile;
+import pr3.xls.XLSWorkbookException;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by dmitry on 25.04.17.
  */
 public class App {
 
-    static class Stats {
-        int fileCount;
-        int rowSkip;
-        int rowAdd;
+//    https://habrahabr.ru/post/130195/
+    private static Logger log = Logger.getLogger(App.class.getName());
 
-        Stats() {
-            reset();
-        }
-
-        public void reset() {
-            fileCount = 0;
-            rowSkip = 0;
-            rowAdd = 0;
-        }
-
-        @Override
-        public String toString() {
-            int rowTotal = rowSkip + rowAdd;
-            return "Обработано: " +
-                    " файлов " + fileCount +
-                    ", строк всего " + rowTotal +
-                    ", добавлено " + rowAdd +
-                    ", пропущено " + rowSkip;
-        }
-
-    }
 
     /**
      * Настройки программы
@@ -129,10 +112,9 @@ public class App {
                 srcFileName = new FileName(path.toString());
                 XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                 xlsParser.parseFile();
-            } catch (Exception e) {
-                addToLog("Файл НЕ обработан, т.к. произошло исключение!");
-                addToLog(e);
-                e.printStackTrace();
+            } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
+                log.log(Level.SEVERE, "Файл НЕ обработан, т.к. произошло исключение!", e);
+//                e.printStackTrace();
             }
 
             addToLog("---------------------------------------");
@@ -213,7 +195,35 @@ public class App {
 
     private static void addToLog(String mes) {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-        System.out.println(timeStamp + " " +mes);
+//        System.out.println(timeStamp + " " +mes);
+        log.info(timeStamp + " " +mes);
     }
 
 }
+
+//    static class Stats {
+//        int fileCount;
+//        int rowSkip;
+//        int rowAdd;
+//
+//        Stats() {
+//            reset();
+//        }
+//
+//        public void reset() {
+//            fileCount = 0;
+//            rowSkip = 0;
+//            rowAdd = 0;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            int rowTotal = rowSkip + rowAdd;
+//            return "Обработано: " +
+//                    " файлов " + fileCount +
+//                    ", строк всего " + rowTotal +
+//                    ", добавлено " + rowAdd +
+//                    ", пропущено " + rowSkip;
+//        }
+//
+//    }

@@ -25,12 +25,12 @@ public class XLSWorkbook {
 	public Workbook  workbook;
 	public CellStyle commonCellStyle;
 
-	public XLSWorkbook(FileName fileName) throws Exception {
+	public XLSWorkbook(FileName fileName) throws XLSWorkbookException {
 
 		this.fileName = fileName;
 
 		if (!(fileName.getExtension().equalsIgnoreCase("xls") || fileName.getExtension().equalsIgnoreCase("xlsx"))) {
-			throw new Exception("файл для парсинга (" + fileName.getFullNameWithoutDir() + ") должен иметь расширение xls или xlsx, а не " + fileName.getExtension());
+			throw new XLSWorkbookException("файл для парсинга (" + fileName.getFullNameWithoutDir() + ") должен иметь расширение xls или xlsx, а не " + fileName.getExtension());
 		}
 	}
 

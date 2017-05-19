@@ -46,7 +46,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 */
 	private IniValues iniValues;
 
-	public XLSWorkbookSrc(FileName fileName, IniValues iniValues) throws Exception {
+	public XLSWorkbookSrc(FileName fileName, IniValues iniValues) throws XLSWorkbookException {
 		super(fileName);
 
 		this.iniValues = iniValues;
@@ -68,15 +68,15 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			in.close();
 
 		} catch(FileNotFoundException e) {
-			throw new Exception("файл " + fileName + " не найден");
+			throw new XLSWorkbookException("файл " + fileName + " не найден");
 		} catch (IOException e) {
-			throw new Exception("при чтении файла " + fileName);
+			throw new XLSWorkbookException("при чтении файла " + fileName);
 		}
 
 		createStyles();
 	}
 
-	private void definePriceListParamsFromFileName(String fileNameWithoutExtension) throws Exception {
+	private void definePriceListParamsFromFileName(String fileNameWithoutExtension) throws XLSWorkbookException {
 
 //		int dashPos = fileNameWithoutExtension.lastIndexOf("-") ;
 //		if (dashPos == -1) {
@@ -98,7 +98,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseWorkbook(XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws Exception {
+	public void parseWorkbook(XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws XLSWorkbookException {
 
 		// Перебор листов xls-книги
 		for (int i = 0; i <  workbook.getNumberOfSheets(); i++) {
@@ -114,7 +114,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseSheet(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws Exception {
+	public void parseSheet(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
 		System.out.print("Лист " + srcSheet.getSheetName());
 
 		// Определяем размер строк с данными в виде количества заполненных ячеек

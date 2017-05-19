@@ -5,12 +5,15 @@ import pr3.ini.IniValuesOutDb;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 /**
  * Выходная база данных
  * Created by Дмитрий on 17.05.2017.
  */
 public class OutDb {
+
+    private static Logger log = Logger.getLogger(OutDb.class.getName());
 
     /**
      * Настройки подключения к базе
@@ -25,7 +28,9 @@ public class OutDb {
     }
 
     public Connection connect() throws ClassNotFoundException, SQLException {
+        log.info("Подключение к выходной базе с параметрами:\n" +iniValuesOutDb.asString());
         if (connection == null) {
+
 //            try {
                 Class.forName(iniValuesOutDb.getDriver());
                 connection = DriverManager.getConnection(

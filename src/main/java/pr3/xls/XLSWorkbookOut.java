@@ -22,7 +22,7 @@ public class XLSWorkbookOut extends XLSWorkbook {
 
 	private Sheet sheet;
 
-	public XLSWorkbookOut(FileName fileName) throws Exception {
+	public XLSWorkbookOut(FileName fileName) throws XLSWorkbookException {
 		super(fileName);
 
 		try {
@@ -57,9 +57,9 @@ public class XLSWorkbookOut extends XLSWorkbook {
 
 
 		} catch(FileNotFoundException e) {
-			throw new Exception("файл " + fileName + " не найден");
+			throw new XLSWorkbookException("файл " + fileName + " не найден");
 		} catch (IOException e) {
-			throw new Exception("при чтении файла " + fileName);
+			throw new XLSWorkbookException("при чтении файла " + fileName);
 		}
 
 		createStyles();

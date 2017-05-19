@@ -14,10 +14,10 @@ public class FileName {
 	private String nameWithoutExtension;
 	private String extension;
 
-	public FileName(String fullNameWithDir) throws Exception {
+	public FileName(String fullNameWithDir) throws FileNameException {
 
 		if ((fullNameWithDir == null) || (fullNameWithDir.isEmpty())) {
-			throw new Exception("не задано имя файла");
+			throw new FileNameException("не задано имя файла");
 		}
 
 		this.fullNameWithDir = fullNameWithDir.trim();

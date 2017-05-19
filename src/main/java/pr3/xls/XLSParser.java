@@ -6,6 +6,9 @@ import pr3.ini.IniValuesOutDb;
 import pr3.ini.IniValuesOutXls;
 import pr3.utils.FileName;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Dmitry Ermakov <de@ae-inf.ru>
@@ -35,7 +38,7 @@ public class XLSParser {
 	private IniValues iniValues;
 
 
-	public XLSParser(FileName srcFileName, FileName outFileName, IniValues iniValues) throws Exception {
+	public XLSParser(FileName srcFileName, FileName outFileName, IniValues iniValues) throws XLSWorkbookException, SQLException, ClassNotFoundException {
 		this.iniValues = iniValues;
 
 		srcWb = new XLSWorkbookSrc(srcFileName, iniValues);
@@ -57,7 +60,7 @@ public class XLSParser {
 		return srcWb;
 	}
 
-	public void parseFile() throws Exception {
+	public void parseFile() throws XLSWorkbookException, IOException, SQLException {
 
 		srcWb.parseWorkbook(resWb, resDb);
 
