@@ -1,5 +1,7 @@
 package pr3.xls;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,6 +21,8 @@ import java.io.*;
  * Time: 4:17 PM
  */
 public class XLSWorkbookOut extends XLSWorkbook {
+
+	final static Logger logger = LogManager.getLogger(XLSWorkbookOut.class.getName());
 
 	private Sheet sheet;
 
@@ -84,7 +88,7 @@ public class XLSWorkbookOut extends XLSWorkbook {
 
 		Row row = sheet.createRow(sheet.getLastRowNum()+1);
 
-		System.out.println("resRow:"+(row.getRowNum()+1)+ " getParents:"+resRow.getParentsArrList()+" getNamesArrList: "+resRow.getNamesArrList());
+		logger.debug("resRow:"+(row.getRowNum()+1)+ " getParents:"+resRow.getParentsArrList()+" getNamesArrList: "+resRow.getNamesArrList());
 
 		addCell(row, 0, resRow.getParentsArrList().get(0));
 		addCell(row, 1, resRow.getNamesArrList().get(0));

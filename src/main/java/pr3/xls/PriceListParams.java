@@ -50,14 +50,14 @@ public class PriceListParams {
 
     }
 
-    public PriceListParams(String params) throws Exception {
+    public PriceListParams(String params) throws PriceListParamsException {
         parse(params);
     }
 
-    public void parse(String params) throws Exception {
+    public void parse(String params) throws PriceListParamsException {
         String[] strParams = params.split(PARAMS_DELIM);
         if (strParams.length != PARAMS_COUNT) {
-            throw new Exception("Имя файла должно состоять из " + PARAMS_COUNT + " полей, разделенных '" + PARAMS_DELIM + "'");
+            throw new PriceListParamsException("Имя файла должно состоять из " + PARAMS_COUNT + " полей, разделенных '" + PARAMS_DELIM + "'");
         }
 
         setPriceListSrc(strParams[0]);

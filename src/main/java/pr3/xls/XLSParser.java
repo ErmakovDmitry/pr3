@@ -1,5 +1,7 @@
 package pr3.xls;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pr3.db.OutDb;
 import pr3.ini.IniValues;
 import pr3.ini.IniValuesOutDb;
@@ -16,6 +18,8 @@ import java.sql.SQLException;
  * Time: 1:32 PM
  */
 public class XLSParser {
+
+	final static Logger logger = LogManager.getLogger(XLSParser.class.getName());
 
 	/**
 	 * Xls-книга - источник данных

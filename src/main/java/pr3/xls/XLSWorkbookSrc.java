@@ -1,5 +1,7 @@
 package pr3.xls;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -27,6 +29,8 @@ import java.util.*;
  * Time: 5:17 PM
  */
 public class XLSWorkbookSrc extends XLSWorkbook {
+
+	final static Logger logger = LogManager.getLogger(XLSWorkbookSrc.class.getName());
 
 //	private String insCompanyName;
 //
@@ -84,7 +88,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //		}
 //		insCompanyName = Integer.parseInt(fileNameWithoutExtension.substring(dashPos + 1));
 
-		System.out.println("Наименование файла: " + fileNameWithoutExtension);
+		logger.info("Наименование файла: " + fileNameWithoutExtension);
 
 //		PriceListParams priceListParams = new PriceListParams(fileNameWithoutExtension);
 //
@@ -115,7 +119,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @throws Exception
 	 */
 	public void parseSheet(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
-		System.out.print("Лист " + srcSheet.getSheetName());
+		logger.info("Лист " + srcSheet.getSheetName());
 
 		// Определяем размер строк с данными в виде количества заполненных ячеек
 		Integer modaCellsCount = defineModaCellsCount(srcSheet);
@@ -133,7 +137,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @return Integer Мода количества заполненных ячеек по строкам
 	 */
 	private Integer defineModaCellsCount(Sheet srcSheet) {
-		System.out.println("defineModaCellsCount //////////////////////////////////////////////////");
+		logger.info("defineModaCellsCount //////////////////////////////////////////////////");
 
 		// Мэп количества заполненных ячеек в строке с частотой их встречаемости
 		HashMap<Integer, Integer> cellsInRowHashMap = new HashMap<>();
@@ -170,8 +174,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			totalCount += entry.getValue();
 		}
 
-		System.out.println("Типичная длина строки " + maxCellsCountKey + " (" + maxCellsCount + " из " + totalCount + ")");
-		System.out.println();
+		logger.info("Типичная длина строки " + maxCellsCountKey + " (" + maxCellsCount + " из " + totalCount + ")");
 
 		return maxCellsCountKey;
 	}
@@ -183,7 +186,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @return
 	 */
 	private PriceListHeader priceListStructureDetection(Sheet srcSheet, Integer modaCellsCount) {
-		System.out.println("priceListStructureDetection ///////////////////////////////////////////////////////");
+		logger.info("priceListStructureDetection ///////////////////////////////////////////////////////");
 
 		PriceListHeader header = new PriceListHeader(modaCellsCount);
 
@@ -260,10 +263,10 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 								case ERROR:
 									break;
 								default:
-									System.out.println("Нет обработчика для ячейки типа " + cellType);
+									logger.error("Нет обработчика для ячейки типа " + cellType);
 							}
 						} catch (Exception e) {
-							System.out.println("Exception при получении значения ячейки");
+							logger.error("Exception при получении значения ячейки");
 						}
 
 						if (preCell != null && preCell.getCellTypeEnum() == CellType.BLANK && cellType != CellType.BLANK) {
@@ -272,7 +275,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 						preCell = cell;
 					} else {
-						System.out.println("Значение NULL в ячейке");
+						logger.info("Значение NULL в ячейке");
 					}
 				}
 
@@ -291,7 +294,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 						header.setEndRowInd(row.getRowNum() - 1);
 
 						// Заполняем массив с описанием колонок сведениями про заголовок
-						System.out.println("Header consolidation:");
+						logger.info("Header consolidation:");
 						for (int r = header.getStartRowInd(); r <= header.getEndRowInd(); r++) {
 //							System.out.println("getRow(" + r + "):" + srcSheet.getRow(r));
 							Row headerRow = srcSheet.getRow(r);
@@ -316,19 +319,17 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				}
 				// Признак принадлежности строки заголовку
 				boolean isHeaderLine = (header.getEndRowInd() == null);
-				System.out.println("Заголовок:" + String.valueOf(isHeaderLine));
+				logger.debug("Заголовок:" + String.valueOf(isHeaderLine));
 
-				System.out.print("tmpStrLen:");
+				logger.debug("tmpStrLen:");
 				for (int tmpStrLen : tmpStrLenArr) {
-					System.out.print(" ;" + tmpStrLen);
+					logger.debug(" ;" + tmpStrLen);
 				}
-				System.out.println();
 
-				System.out.print("s:");
+				logger.debug("s:");
 				for (String s : sArr) {
-					System.out.print(" ;" + s);
+					logger.debug(" ;" + s);
 				}
-				System.out.println();
 
 				if (!isHeaderLine /* && dblCells.size() != 0 */) {
 					// Дополняем массив с описанием колонок сведениями про значения
@@ -339,7 +340,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 					}
 				}
 
-				System.out.println(
+				logger.debug(
 						"dataRowInd:"+dataRowInd
 								+ " RowNum:"+(row.getRowNum()+1)
 								+ " outlineLevel:" + outlineLevel
@@ -369,24 +370,21 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //				}
 //				System.out.println("outlineStack:" + outlineStack);
 
-				System.out.println("--------------");
-				System.out.println();
+				logger.info("--------------");
 
 				dataRowInd++;
 				//if (dataRowInd > 20) break;
 			}
 		}
 
-		System.out.print(header.asString());
-
-		System.out.println();
+		logger.info("Заголовок",header.asString());
 
 		return header;
 	}
 
 	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
 
-		System.out.println("dataRowsProcessing ////////////////////////////////////////////////////////////////");
+		logger.info("dataRowsProcessing ////////////////////////////////////////////////////////////////");
 
 		Stack<String> outlineStack = new Stack<>();
 
@@ -417,7 +415,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			int cellsInRow = countCellsInRow(row);
 
 			if (cellsInRow == modaCellsCount) {
-				System.out.println("dataCurRowInd:"+dataCurRowInd + " (in Excel:"+(row.getRowNum()+1+")"));
+				logger.debug("dataCurRowInd:"+dataCurRowInd + " (in Excel:"+(row.getRowNum()+1+")"));
 
 				// Результирующая (выходная) запись
 				ResRow resRow = new ResRow();
@@ -444,7 +442,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 						String cellStrVal = null;
 						if (cellSemanticType != null) {
 //							CellType cellType = cell.getCellTypeEnum();
-							System.out.println(cell.getRowIndex() + ":" + cellColInd + " semanticType:" + cellSemanticType);
+							logger.debug(cell.getRowIndex() + ":" + cellColInd + " semanticType:" + cellSemanticType);
 
 							try {
 								switch (cellSemanticType) {
@@ -490,7 +488,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //									System.out.println("Нет обработчика для ячейки типа " + cellType);
 //							}
 							} catch (Exception e) {
-								System.out.println("Exception при получении значения ячейки");
+								logger.error("Exception при получении значения ячейки");
 							}
 
 						}
@@ -530,7 +528,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 					outlineStack.set(outlineLevel, outlineLevelName);
 					preOutlineLevel = outlineLevel;
 				}
-				System.out.println("outlineStack:" + outlineStack);
+				logger.debug("outlineStack:" + outlineStack);
 				// Сборка в строку всех элементов стека кроме последнего
 //				String r = "";
 //				Iterator<String> iter = outlineStack.iterator();
@@ -554,7 +552,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				}
 
 				if (!resRow.allPricesNull()) {
-					System.out.println("resRow:" + resRow);
+					logger.debug("resRow:" + resRow);
 					// Если существует объект для выходной xls-книга, пишем в нее очередную строку
 					if (XLSWorkbookOut != null) {
 						XLSWorkbookOut.addRow(resRow);
@@ -568,8 +566,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 						// Сохраняем запись
 						resDb.ins(outDbRow);
 					}
-					System.out.println("--------------");
-					System.out.println();
+					logger.info("--------------");
 				}
 
 				if (dataCurRowInd > 20) break;
@@ -580,8 +577,6 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //		for (int z = 0; z < columns.length; z++) {
 //			System.out.println("; header[" + z + "] " + columns[z]);
 //		}
-
-		System.out.println();
 
 //		for (int maxStrLen : maxStrLenArr) {
 //			System.out.print(" ;" + maxStrLen);

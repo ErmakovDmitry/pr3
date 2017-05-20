@@ -1,6 +1,10 @@
 package pr3;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 import pr3.ini.IniValues;
+import pr3.ini.XmlIniFileException;
 import pr3.utils.FileName;
 import pr3.utils.FileNameException;
 import pr3.xls.ColumnSemanticType;
@@ -12,10 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by dmitry on 25.04.17.
@@ -23,15 +23,49 @@ import java.util.logging.Logger;
 public class App {
 
 //    https://habrahabr.ru/post/130195/
-    private static Logger log = Logger.getLogger(App.class.getName());
-
+    final static Logger logger = LogManager.getLogger(App.class.getName());
+//    String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 
     /**
      * Настройки программы
      */
     public static IniValues iniValues;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)   {
+//        Properties props = System.getProperties();
+//        props.setProperty("org.apache.logging.log4j.simplelog.StatusLogger.level", "TRACE");
+
+//        java.util.logging.Formatter="%2$s: %5$s%6$s%n"
+//
+////        try {
+////            file://C:/Users/Дмитрий/IdeaProjects/pr3/src/main/java/pr3/App.java
+////            String propertiesFileName = "C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\src\\main\\java\\logging.properties";
+//            String propertiesFileName = "/resources/logging.properties";
+////            String propertiesFileName = "1";
+//            ClassLoader classLoader = App.class.getClassLoader();
+//            if (classLoader == null) {
+//                System.out.println("null");
+//            } else {
+//                System.out.println("not null");
+//            }
+////            URL resource = classLoader.getResource(propertiesFileName);
+//            InputStream inputStream = classLoader.getResourceAsStream(propertiesFileName);
+//            if (inputStream == null) {
+//                System.out.println("null");
+//            } else {
+//                System.out.println("not null");
+//            }
+//
+//            LogManager.getLogManager().readConfiguration(
+////                    App.class.getResourceAsStream(propertiesFileName)
+//                    inputStream
+//            );
+//        } catch (IOException e) {
+//
+//            System.err.println("Could not setup logger configuration: " + e.toString());
+//        }
+//        exit(0);
+
         ColumnSemanticType.init();
 
 //        String jarName = new java.io.File(FileName.class.getProtectionDomain()
@@ -45,12 +79,12 @@ public class App {
             throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
         }
 
-        FileName iniFileName = new FileName(args[0]);
-        // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
-        // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
-        addToLog("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
+        try {
 
-//        try {
+            FileName iniFileName = new FileName(args[0]);
+            // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
+            // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
+            logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
 
             if (!iniFileName.getExtension().equalsIgnoreCase("xml")) {
                 throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml, а не " + iniFileName.getExtension());
@@ -59,21 +93,16 @@ public class App {
             // Загрузка настроек из xml-файла
             XmlIniFile xmlIniFile = new XmlIniFile();
             iniValues = xmlIniFile.load(iniFileName.getFullNameWithDir(), IniValues.class);
-            addToLog(iniValues.asString());
+            logger.info(iniValues.asString());
 
-//        } catch (XmlIniFileException e) {
-//            throw new RuntimeException(e.getLocalizedMessage());
-//        }
+//            String srcDirName = iniValues.getSrcDirName();
+            String srcDirName = iniValues.getIniValuesSrc().getDirName();
+
+            FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
+            logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
 
 
-//        String srcDirName = iniValues.getSrcDirName();
-        String srcDirName = iniValues.getIniValuesSrc().getDirName();
-
-        FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
-        addToLog("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
-
-//	    try {
-        addToLog("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
+            logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
 
         // Рекурсивный перебор фйайлов в каталоге-источнике
         Files.find(
@@ -100,27 +129,33 @@ public class App {
                             return true;
                         }
                     } catch (Exception e) {
-                        addToLog(e);
+                        logger.log(Level.ERROR, "Iterate files", e);
                     }
                 }
                 return false;
             }
         ).forEach(path -> {
-            addToLog("Обработка файла: "+path);
-            FileName srcFileName = null;
+            logger.info("Обработка файла: " + path);
+//            FileName srcFileName = null;
             try {
-                srcFileName = new FileName(path.toString());
+                FileName srcFileName = new FileName(path.toString());
                 XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                 xlsParser.parseFile();
             } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
-                log.log(Level.SEVERE, "Файл НЕ обработан, т.к. произошло исключение!", e);
+                logger.log(Level.ERROR, "Файл НЕ обработан, т.к. произошло исключение!", e);
 //                e.printStackTrace();
             }
 
-            addToLog("---------------------------------------");
-            addToLog("Обработка файла: " + path + " закончена");
-            addToLog("");
+            logger.info("---------------------------------------");
+            logger.info("Обработка файла: " + path + " закончена");
         });
+        } catch (XmlIniFileException e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        } catch (FileNameException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 /*
         FileName resFileName = new FileName(srcDirName + resFN);
@@ -188,16 +223,6 @@ public class App {
 */
     }
 
-    private static void addToLog(Exception e) {
-        addToLog(e.getLocalizedMessage());
-//        e.printStackTrace();
-    }
-
-    private static void addToLog(String mes) {
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-//        System.out.println(timeStamp + " " +mes);
-        log.info(timeStamp + " " +mes);
-    }
 
 }
 

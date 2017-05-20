@@ -1,5 +1,7 @@
 package pr3.xls;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -15,6 +17,9 @@ import java.beans.PropertyChangeSupport;
  * Time: 4:46 PM
  */
 public class XLSWorkbook {
+
+	final static Logger logger = LogManager.getLogger(XLSWorkbook.class.getName());
+
 	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	public PropertyChangeSupport getPropertyChangeSupport() {
