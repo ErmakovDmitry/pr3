@@ -23,8 +23,12 @@ import java.sql.SQLException;
 public class App {
 
 //    https://habrahabr.ru/post/130195/
+//    http://stackoverflow.com/questions/30881990/how-to-configure-log4j-2-x-purely-programmatically
+
+    /**
+     * Логгер
+     */
     final static Logger logger = LogManager.getLogger(App.class.getName());
-//    String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 
     /**
      * Настройки программы
@@ -44,16 +48,16 @@ public class App {
 ////            String propertiesFileName = "1";
 //            ClassLoader classLoader = App.class.getClassLoader();
 //            if (classLoader == null) {
-//                System.out.println("null");
+//                logger.debug("null");
 //            } else {
-//                System.out.println("not null");
+//                logger.debug("not null");
 //            }
 ////            URL resource = classLoader.getResource(propertiesFileName);
 //            InputStream inputStream = classLoader.getResourceAsStream(propertiesFileName);
 //            if (inputStream == null) {
-//                System.out.println("null");
+//                logger.debug("null");
 //            } else {
-//                System.out.println("not null");
+//                logger.debug("not null");
 //            }
 //
 //            LogManager.getLogManager().readConfiguration(
@@ -73,7 +77,7 @@ public class App {
 //                .getLocation()
 //                .getPath())
 //                .getName();
-//        System.out.println(jarName);
+//        logger.debug(jarName);
 
         if (args.length != 1) {
             throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
@@ -111,7 +115,7 @@ public class App {
 //            (filePath, fileAttr) -> fileAttr.isRegularFile()
             (path, basicFileAttributes) -> {
                 if (basicFileAttributes.isRegularFile()) {
-//                        System.out.println("path:"+path);
+//                    logger.debug("path:"+path);
                     try {
                         FileName srcFileName = new FileName(path.toString());
                         String nameWithoutExtension = srcFileName.getNameWithoutExtension();

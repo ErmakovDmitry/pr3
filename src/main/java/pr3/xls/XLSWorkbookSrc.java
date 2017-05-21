@@ -92,7 +92,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 //		PriceListParams priceListParams = new PriceListParams(fileNameWithoutExtension);
 //
-//		System.out.println("Параметры прайс-листа из наименования файла: " + priceListParams);
+//		logger.info("Параметры прайс-листа из наименования файла: " + priceListParams);
 
 	}
 
@@ -151,13 +151,13 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 			// Количество заполненных ячеек в строке (длина строки)
 			int cellsInRow = countCellsInRow(row);
-//			System.out.println(row.getRowNum() + " " + cellsInRow);
+//			logger.debug(row.getRowNum() + " " + cellsInRow);
 			// Создание в мэпе нового элемента для подсчета количества строк с еще не встречавшейся длиной
 			cellsInRowHashMap.computeIfAbsent(cellsInRow, (v) -> 0);
 			// Подсчет количества строк с разной длиной
 			cellsInRowHashMap.computeIfPresent(cellsInRow, (k,v) -> v+1);
 		}
-//		System.out.println("Длины строк " + cellsInRowHashMap);
+//		logger.debug("Длины строк " + cellsInRowHashMap);
 
 		// Количество строк с типичной длиной
 		int maxCellsCount = 0;
@@ -240,7 +240,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				while (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (cell != null) {
-//						System.out.print(cell.getRowIndex() + ":" + cell.getColumnIndex() + " ");
+//						logger.debug(cell.getRowIndex() + ":" + cell.getColumnIndex() + " ");
 
 						CellType cellType = cell.getCellTypeEnum();
 						try {
@@ -296,12 +296,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 						// Заполняем массив с описанием колонок сведениями про заголовок
 						logger.info("Header consolidation:");
 						for (int r = header.getStartRowInd(); r <= header.getEndRowInd(); r++) {
-//							System.out.println("getRow(" + r + "):" + srcSheet.getRow(r));
+//							logger.debug("getRow(" + r + "):" + srcSheet.getRow(r));
 							Row headerRow = srcSheet.getRow(r);
 							for (int c = headerRow.getFirstCellNum(); c < headerRow.getLastCellNum(); c++) {
 								Cell headerCell = headerRow.getCell(c);
 								String headerCellStrVal = headerCell.getStringCellValue();
-//								System.out.println("headerCell(" + c + "):" + headerCell.getStringCellValue());
+//								logger.debug("headerCell(" + c + "):" + headerCell.getStringCellValue());
 								if (r == header.getStartRowInd()) {
 									columns[c].setHeaderCellStrVal(headerCellStrVal);
 								} else {
@@ -368,7 +368,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //					outlineStack.set(outlineLevel, outlineLevelName);
 //					preOutlineLevel = outlineLevel;
 //				}
-//				System.out.println("outlineStack:" + outlineStack);
+//				logger.debug("outlineStack:" + outlineStack);
 
 				logger.info("--------------");
 
@@ -485,7 +485,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //								case ERROR:
 //									break;
 //								default:
-//									System.out.println("Нет обработчика для ячейки типа " + cellType);
+//									logger.debug("Нет обработчика для ячейки типа " + cellType);
 //							}
 							} catch (Exception e) {
 								logger.error("Exception при получении значения ячейки");
@@ -503,7 +503,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //
 //						preCell = cell;
 //					} else {
-//						System.out.println("NULL");
+//						logger.debug("NULL");
 					}
 
 				}
@@ -573,15 +573,14 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			}
 		}
 
-//		System.out.print("header2: ");
+//		logger.debug("header2: ");
 //		for (int z = 0; z < columns.length; z++) {
-//			System.out.println("; header[" + z + "] " + columns[z]);
+//			logger.debug("; header[" + z + "] " + columns[z]);
 //		}
 
 //		for (int maxStrLen : maxStrLenArr) {
-//			System.out.print(" ;" + maxStrLen);
+//			logger.debug(" ;" + maxStrLen);
 //		}
-//		System.out.println();
 
 	}
 
@@ -592,7 +591,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //		Boolean cityColMissed = false; // Признак того, что в исходном файле отсутствует колонка "Населенный пункт"
 //
 //		// Ищем заголовок таблицы с ценами по названиям колонок с учетом их порядка
-//		System.out.print("1) ищем заголовок ... ");
+//		logger.debug("1) ищем заголовок ... ");
 //
 //		Row row;
 //		Iterator<Row> it = srcSheet.iterator();
@@ -610,7 +609,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //
 //				if (!missCell) {
 //					cell = cells.next();
-//					System.out.println("cell " + cell.toString());
+//					logger.debug("cell " + cell.toString());
 //				} else {
 //					missCell= false;
 //				}
@@ -639,7 +638,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //
 //		if (headerFound) {
 //			// Заголовок таблицы найден
-//			System.out.println("найден");
+//			logger.debug("найден");
 //
 //			// Список диапазонов объединенных ячеек
 //			List<CellRangeAddress> regionsList = new ArrayList<CellRangeAddress>();
@@ -648,13 +647,13 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //			}
 //
 //			// Перебираем строки с данными
-//			System.out.println("2) перебираем строки с данными ...");
+//			logger.debug("2) перебираем строки с данными ...");
 //			int rowInd = 0;
 //			RefRow preRefRow = new RefRow();
 //			while (it.hasNext()) {
 //				Boolean missRow = false; // Флаг пропуска строки, например, по причине ее несоответсвия формату
 //				row = it.next();
-//				System.out.println("стр. " + (row.getRowNum()+1) + ": ");
+//				logger.debug("стр. " + (row.getRowNum()+1) + ": ");
 //				Iterator<Cell> cells = row.iterator();
 //				String cellSrcVals = "";
 //				int cellIndShift =0;
@@ -662,7 +661,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //				RefRow refRow = new RefRow();
 //				Field[] rowFields = RefRow.class.getDeclaredFields();
 //				while (cells.hasNext() && cellInd<rowFields.length) {
-////					System.out.println("!!!:"+rowFields[cellInd].getNamesArrList());
+////					logger.debug("!!!:"+rowFields[cellInd].getNamesArrList());
 //					if (cityColMissed && (rowFields[cellInd].getName().equalsIgnoreCase("city"))) {
 //						cellIndShift++;
 //					}
@@ -690,7 +689,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //					Field field = rowFields[cellInd];
 //					Type fieldType = field.getType();
 //
-////					System.out.println("cell "+cellInd+":'"+cell.toString()+"' cellType:"+cellType+" fieldName:"+field.getNamesArrList()+" fieldType:"+fieldType);
+////					logger.debug("cell "+cellInd+":'"+cell.toString()+"' cellType:"+cellType+" fieldName:"+field.getNamesArrList()+" fieldType:"+fieldType);
 //
 //					if (
 //						((fieldType.equals(Integer.class) || fieldType.equals(Double.class)) && (cellType == Cell.CELL_TYPE_NUMERIC)) ||
@@ -758,7 +757,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //
 //					cellInd++;
 //				}
-////				System.out.println("cellSrcVals:"+cellSrcVals);
+////				logger.debug("cellSrcVals:"+cellSrcVals);
 //
 //				if (missRow == false && ((refRow.price_leg <= 0) && (refRow.price_gruz <= 0) && (refRow.price_avt <= 0))) {
 //					missRow = true;
@@ -767,8 +766,8 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //				if (refRow.raion.trim().length() == 0) {
 //					refRow.raion = preRefRow.raion;
 //				}
-////				System.out.println("preRefRow:"+preRefRow);
-//				System.out.println("refRow:"+refRow);
+////				logger.debug("preRefRow:"+preRefRow);
+//				logger.debug("refRow:"+refRow);
 //
 //				if (!missRow) {
 //					pcs.firePropertyChange("rowAdd", null, refRow);
@@ -779,13 +778,13 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //
 //				preRefRow = (RefRow) refRow.clone();
 //
-//				System.out.println();
+//				logger.debug();
 //
 //				rowInd++;
 //			}
 //
 //		} else {
-//			System.out.println("не найден");
+//			logger.debug("не найден");
 //		}
 //
 //	}

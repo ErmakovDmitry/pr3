@@ -1,5 +1,8 @@
 package pr3.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Dmitry Ermakov <de@ae-inf.ru>
@@ -8,6 +11,11 @@ package pr3.utils;
  * To change this template use File | IniValues | File Templates.
  */
 public class FileName {
+
+	/**
+	 * Логгер
+	 */
+	final static Logger logger = LogManager.getLogger(FileName.class.getName());
 
 	private String fullNameWithDir;
 	private String fullNameWithoutDir;
@@ -42,10 +50,10 @@ public class FileName {
 			extension = new String("");
 		}
 
-//		System.out.println("fullNameWithDir: "+this.fullNameWithDir);
-//		System.out.println("fullNameWithoutDir: "+fullNameWithoutDir);
-//		System.out.println("nameWithoutExtension: "+nameWithoutExtension);
-//		System.out.println("extension: "+extension);
+//		logger.debug("fullNameWithDir: "+this.fullNameWithDir);
+//		logger.debug("fullNameWithoutDir: "+fullNameWithoutDir);
+//		logger.debug("nameWithoutExtension: "+nameWithoutExtension);
+//		logger.debug("extension: "+extension);
 	}
 
 	public String getFullNameWithDir() {

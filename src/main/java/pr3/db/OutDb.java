@@ -1,11 +1,13 @@
 package pr3.db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pr3.ini.IniValuesOutDb;
 
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.logging.Logger;
+
 
 /**
  * Выходная база данных
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class OutDb {
 
-    private static Logger log = Logger.getLogger(OutDb.class.getName());
+    private static Logger logger = LogManager.getLogger(OutDb.class.getName());
 
     /**
      * Настройки подключения к базе
@@ -28,7 +30,7 @@ public class OutDb {
     }
 
     public Connection connect() throws ClassNotFoundException, SQLException {
-        log.info("Подключение к выходной базе с параметрами:\n" +iniValuesOutDb.asString());
+        logger.info("Подключение к выходной базе с параметрами:\n" +iniValuesOutDb.asString());
         if (connection == null) {
 
 //            try {
@@ -71,16 +73,16 @@ public class OutDb {
                 int id = rs.getInt(1);
         //            String name = rs.getString(2);
         //            String author = rs.getString(3);
-        //            System.out.printf("id: %d, name: %s, author: %s %n", id, name, author);
-                System.out.printf("sel(): %d\n", id);
+        //            logger.debug("id: %d, name: %s, author: %s %n", id, name, author);
+                logger.debug("sel(): %d\n", id);
             }
 
         } catch (SQLException ex){
             // handle any errors
             throw new SQLException(ex);
-//            System.out.println("SQLException: " + ex.getMessage());
-//            System.out.println("SQLState: " + ex.getSQLState());
-//            System.out.println("VendorError: " + ex.getErrorCode());
+//            logger.debug("SQLException: " + ex.getMessage());
+//            logger.debug("SQLState: " + ex.getSQLState());
+//            logger.debug("VendorError: " + ex.getErrorCode());
         } finally {
             // it is a good idea to release
             // resources in a finally{} block
@@ -109,7 +111,7 @@ public class OutDb {
         String query = "INSERT INTO test.books (id, name, author) \n" +
                 " VALUES (3, '" + outDbRow.getPlna_item_text() + "', 'Kathy Sieara');";
 
-        System.out.println(query);
+        logger. debug(query);
         // executing SELECT query
 //        stmt.executeUpdate(query);
     }
@@ -157,11 +159,11 @@ public class OutDb {
 			for(TableToConv tableToConv : tablesToConvList) {
 
 //				String tblSql = tableToConv.getSql();
-//				System.out.println(tableToConv.getName() + "=> " + tblSql);
+//				logger.debug(tableToConv.getName() + "=> " + tblSql);
 //				if (tblSql != null) {
-//					System.out.println("SQL");
+//					logger.debug("SQL");
 //				} else {
-//					System.out.println("not SQL");
+//					logger.debug("not SQL");
 //				}
 
 				// Спец. запрос, которые поставляет исходный набор данных вместо исходной таблицы
@@ -170,7 +172,7 @@ public class OutDb {
 				String tableName = tableToConv.getName();
 
 				timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-				System.out.println("\n" + timeStamp + " table '" + tableName + "':");
+				logger.debug("\n" + timeStamp + " table '" + tableName + "':");
 
 				Boolean success = false;
 
@@ -178,19 +180,19 @@ public class OutDb {
 				int destTableRecCount = 0;
 
 				// Проверка существования исходной таблицы в Firebird, если исходные данные не поставляются запросом
-				System.out.print("\tchecking existance in Firebird base ... ");
+				logger.debug("\tchecking existance in Firebird base ... ");
 				if ((specSelQuery !=null) || srcDb.tableExists(tableName)) {
-					System.out.println("OK");
+					logger.debug("OK");
 
 					// Проверка существования исходной таблицы в PostgreSQL
-					System.out.print("\tchecking existance in PostgreSQL base ... ");
+					logger.debug("\tchecking existance in PostgreSQL base ... ");
 					if (destDb.tableExists(pgSchema, tableName)) {
-						System.out.println("OK");
+						logger.debug("OK");
 
 						DbTable srcTable = srcDb.getTable(tableName, specSelQuery);
 						DbTable destTable = destDb.getTable(pgSchema, tableName);
 
-						System.out.print("\tchecking field set compatibility ... ");
+						logger.debug("\tchecking field set compatibility ... ");
 
 						// log-сравнения полей
 						StringBuilder colSetLog = new StringBuilder();
@@ -198,15 +200,15 @@ public class OutDb {
 						// Проверка совместимости наборов полей в исходной и целевой таблицах
 						if (fb2PgConverter.columnSetsCompatible(srcTable, destTable, colSetLog)) {
 
-//							System.out.println();
-//							System.out.print(colSetLog);
-							System.out.println("OK");
+//							logger.debug();
+//							logger.debug(colSetLog);
+							logger.debug("OK");
 
 							// Очистка целевой таблицы
 							destTable.empty();
 
 							srcTableRecCount = srcTable.getRecordCount();
-							System.out.print("\tdata converting (" + srcTableRecCount + " records) ... ");
+							logger.debug("\tdata converting (" + srcTableRecCount + " records) ... ");
 
 							// Конвертация данных
 							fb2PgConverter.convTableData(srcTable, destTable);
@@ -214,44 +216,44 @@ public class OutDb {
 							// Наивная проверка результатов конвертации
 							destTableRecCount = destTable.getRecordCount();
 							if (destTableRecCount == srcTableRecCount) {
-								System.out.println("OK");
+								logger.debug("OK");
 								success = true;
 							} else {
-								System.out.println("\trecords count in PostgreSQL (" + destTableRecCount + ") NOT EQUAL records count in Firebird (" + srcTableRecCount + ")");
+								logger.debug("\trecords count in PostgreSQL (" + destTableRecCount + ") NOT EQUAL records count in Firebird (" + srcTableRecCount + ")");
 							}
 
 						} else {
-							System.out.println("FAIL");
-							System.out.print(colSetLog);
+							logger.debug("FAIL");
+							logger.debug(colSetLog);
 						}
 
 					} else {
-						System.out.println("FAIL");
+						logger.debug("FAIL");
 					}
 				} else {
-					System.out.println("FAIL");
+					logger.debug("FAIL");
 				}
 
 				if (success) {
 					timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-					System.out.println(timeStamp + " SUCCESS (" + destTableRecCount + " records converted)");
+					logger.debug(timeStamp + " SUCCESS (" + destTableRecCount + " records converted)");
 					success_count++;
 				} else {
-					System.out.println("ERROR");
+					logger.debug("ERROR");
 					unsuccess_count++;
 				}
 			}
 
-			System.out.println("\nResult: " + success_count + " tables successfully converted; " + unsuccess_count + " tables NOT converted");
+			logger.debug("\nResult: " + success_count + " tables successfully converted; " + unsuccess_count + " tables NOT converted");
 
 		} catch (SQLException e) {
-			System.out.println("Error while connection to database: " + e.getLocalizedMessage());
+			logger.debug("Error while connection to database: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (DbException e) {
-			System.out.println("Error while operating on database structure: " + e.getLocalizedMessage());
+			logger.debug("Error while operating on database structure: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (Fb2PgConverterException e) {
-			System.out.println("Error while data converting: " + e.getLocalizedMessage());
+			logger.debug("Error while data converting: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
   */
