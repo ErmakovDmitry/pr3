@@ -36,6 +36,8 @@ public class App {
     public static IniValues iniValues;
 
     public static void main(String[] args)   {
+        logger.info("////////////////////////////////////////////////");
+
 //        Properties props = System.getProperties();
 //        props.setProperty("org.apache.logging.log4j.simplelog.StatusLogger.level", "TRACE");
 

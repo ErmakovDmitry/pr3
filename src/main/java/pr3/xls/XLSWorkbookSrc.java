@@ -321,15 +321,16 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				boolean isHeaderLine = (header.getEndRowInd() == null);
 				logger.debug("Заголовок:" + String.valueOf(isHeaderLine));
 
-				logger.debug("tmpStrLen:");
-				for (int tmpStrLen : tmpStrLenArr) {
-					logger.debug(" ;" + tmpStrLen);
-				}
+				// Дербан ячеек строки
+//				logger.debug("tmpStrLen:");
+//				for (int tmpStrLen : tmpStrLenArr) {
+//					logger.debug(" ;" + tmpStrLen);
+//				}
 
-				logger.debug("s:");
-				for (String s : sArr) {
-					logger.debug(" ;" + s);
-				}
+//				logger.debug("s:");
+//				for (String s : sArr) {
+//					logger.debug(" ;" + s);
+//				}
 
 				if (!isHeaderLine /* && dblCells.size() != 0 */) {
 					// Дополняем массив с описанием колонок сведениями про значения
