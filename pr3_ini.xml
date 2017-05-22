@@ -7,14 +7,14 @@
 	LOG_BATCH_COUNT_IN_LINE = "5">
 	<!-- Source directory with xls-files -->
 	<Src
-		DIR_NAME1 = "/home/hddraid/TMP/5/"
-		DIR_NAME = "C:\Users\Дмитрий\TMP\5\">
+		DIR_NAME = "/home/hddraid/TMP/5/"
+		DIR_NAME1 = "C:\Users\Дмитрий\TMP\5\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
-		FILE_NAME1 = "/home/hddraid/TMP/5/res.xlsx"
-		FILE_NAME = "C:\Users\Дмитрий\TMP\5\res.xlsx">
+		FILE_NAME = "/home/hddraid/TMP/5/res.xlsx"
+		FILE_NAME1 = "C:\Users\Дмитрий\TMP\5\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb
