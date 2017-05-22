@@ -18,19 +18,21 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
-import org.apache.logging.log4j.core.appender.rolling.RollingFileManager;
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
+import org.apache.logging.log4j.core.appender.rolling.*;
 import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import org.apache.logging.log4j.core.util.Booleans;
 import org.apache.logging.log4j.core.util.Integers;
+import org.apache.logging.log4j.status.StatusLogger;
 import pr3.ini.IniValues;
+import pr3.ini.MPLoggingConfiguration;
 import pr3.ini.XmlIniFileException;
 import pr3.utils.FileName;
 import pr3.utils.FileNameException;
@@ -39,11 +41,13 @@ import pr3.xls.XLSParser;
 import pr3.ini.XmlIniFile;
 import pr3.xls.XLSWorkbookException;
 
+import java.io.Console;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.zip.Deflater;
 
 /**
  * Created by dmitry on 25.04.17.
@@ -68,7 +72,6 @@ public class App {
 
 
     public static <B extends FileAppender.Builder<B>> FileAppender createAppender(
-            // @formatter:off
             final String fileName,
             final Layout<? extends Serializable> layout,
             final Configuration config) {
@@ -93,13 +96,9 @@ public class App {
 
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         final Configuration config = ctx.getConfiguration();
-
-//        Layout layout = PatternLayout.createLayout(LOG_PATTERN, null, config, null, null, false, false, null, null);
         Layout layout = PatternLayout.newBuilder().withPattern(LOG_PATTERN).withConfiguration(config).build();
 
-
         Appender appender = createAppender(path, layout, config);
-
 
         appender.start();
         config.addAppender(appender);
@@ -113,12 +112,18 @@ public class App {
 //    https://stackoverflow.com/questions/26119795/how-to-do-programmatic-configuration-for-log4j2-rollingfileappender
 //    RollingFileAppender.createAppender(dir + "log\\test.log", dir + "log\\test-%i.log",
 //            "true", "File", "false", "128", "true", policy, strategy, layout, (Filter) null, "false", "false", (String) null, config);
-//    public static void configLog() {
+    public static void configLog() {
+//        PatternLayout layout = PatternLayout.createDefaultLayout();
+
+
 //        String dir = System.getProperty("java.io.tmpdir") + "test\\";
-//        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-//        final Configuration config = ctx.getConfiguration();
-//        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN).build();
-//        SizeBasedTriggeringPolicy policy = SizeBasedTriggeringPolicy.createPolicy("1KB");
+        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        final Configuration config = ctx.getConfiguration();
+        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN).build();
+        TriggeringPolicy policy = CompositeTriggeringPolicy.createPolicy(
+                SizeBasedTriggeringPolicy.createPolicy("3 M"),
+                OnStartupTriggeringPolicy.createPolicy(1));
+        final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy("9", "1", "max", Deflater.NO_COMPRESSION + "", null, true, config);
 //        DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy("10", "0", null, null, null, false, config);
 //        RollingFileManager fileManager = RollingFileManager.getFileManager(
 //                dir + "log\\test.log"
@@ -133,21 +138,70 @@ public class App {
 //        policy.initialize(fileManager);
 //        RollingFileAppender appender = RollingFileAppender.createAppender(dir + "log\\test.log", dir + "log\\test-%i.log",
 //                "false", "File", "false", "128", "true", policy, strategy, layout, (Filter) null, "false", "false", (String) null, config);
-//        appender.start();
-//        config.addAppender(appender);
-//        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.INFO, null);
-//        AppenderRef[] refs = new AppenderRef[] { ref };
-//        LoggerConfig loggerConfig = LoggerConfig.createLogger("true", Level.INFO, LogManager.ROOT_LOGGER_NAME, "true",
-//                refs, null, config, null);
-//        loggerConfig.addAppender(appender, Level.INFO, null);
-//        config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
-//        ctx.updateLoggers();
-//    }
+        String logFilePath = "C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\log\\";
+        String PR3_LOGGER_NAME = "pr3";
+        String FILE_PATTERN_LAYOUT = "%n[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%l]%n\t%m%n%n";
+        String LOG_FILE_NAME = "pr3.log";
+        String LOG_FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log";
+
+        Appender fileAppender = RollingFileAppender.newBuilder()
+                .withAdvertise(Boolean.parseBoolean(null))
+                .withAdvertiseUri(null)
+                .withAppend(true)
+                .withBufferedIo(true)
+                .withBufferSize(8192)
+                .setConfiguration(config)
+                .withFileName(logFilePath + LOG_FILE_NAME)
+                .withFilePattern(logFilePath + LOG_FILE_NAME_PATTERN)
+                .withFilter(null)
+                .withIgnoreExceptions(true)
+                .withImmediateFlush(true)
+                .withLayout(layout)
+                .withCreateOnDemand(false)
+                .withLocking(false)
+                .withName("File")
+                .withPolicy(policy)
+                .withStrategy(strategy)
+                .build();
+        fileAppender.start();
+
+//        ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
+        Appender consoleAppender = ConsoleAppender.newBuilder().withName("console").build();
+        consoleAppender.start();
+
+        config.addAppender(fileAppender);
+        config.addAppender(consoleAppender);
+
+        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.INFO, null);
+        AppenderRef refConsole = AppenderRef.createAppenderRef("console", Level.ALL, null);
+        AppenderRef[] refs = new AppenderRef[] { ref, refConsole };
+
+        LoggerConfig loggerConfig = LoggerConfig.createLogger("true", Level.ALL, LogManager.ROOT_LOGGER_NAME, "true",
+                refs, null, config, null);
+        loggerConfig.addAppender(fileAppender, Level.INFO, null);
+        loggerConfig.addAppender(consoleAppender, Level.ALL, null);
+
+        config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
+        ctx.updateLoggers();
+    }
 
     public static void main(String[] args)   {
-        logger.info("////////////////////////");
 
-        initLogFile("/home/dmitry/IdeaProjects/pr3/log/zpr3_%d{yyyy-MM-dd HH:mm:ss}_%i.log", Level.ALL);
+/*
+https://stackoverflow.com/questions/30881990/how-to-configure-log4j-2-x-purely-programmatically
+    // set log4j.configurationFactory to be our optimized version
+    final String factory = MPLoggingConfiguration.class.getName();
+    System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, factory);
+    StatusLogger.getLogger().debug("Using log4j configuration factory '{}'", factory);
+    LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
+    loggerContext.reconfigure();
+LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
+*/
+configLog();
+        logger.info("////////////////////////");
+//        initLogFile("/home/dmitry/IdeaProjects/pr3/log/zpr3_%d{yyyy-MM-dd HH:mm:ss}_%i.log", Level.ALL);
+//        initLogFile("C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\zpr3_%d{yyyy-MM-dd HH:mm:ss}_%i.log", Level.ALL);
+//        initLogFile("C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\log\\zpr3.log", Level.ALL);
 
 //        RollingFileAppender rollingFileAppender = new FileAppender();
 //        val console_appender = new ConsoleAppender()

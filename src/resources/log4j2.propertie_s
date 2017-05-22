@@ -1,0 +1,1 @@
+log4j.configurationFactory=pr3.ini.MPLoggingConfiguration$MPConfigurationFactory
