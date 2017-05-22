@@ -55,6 +55,11 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -65,69 +70,92 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <!-- Make this jar executable -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>LATEST</version>
-                <configuration>
-                    <!-- DO NOT incllog4j2.propertiesties file in your Jar -->
-                    <!--<excludes>-->
-                        <!--<excludelog4j2.propertiesties</exclude>-->
-                    <!--</excludes>-->
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <!-- Jar file entry point -->
-                            <mainClass>ru.aeinf.pr3.App</mainClass>
-                            <packageName>ru.aeinf.pr3</packageName>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>LATEST</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.1</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
+                        <id>create-executable-jar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>single</goal>
                         </goals>
                         <configuration>
-                            <includeScope>compile</includeScope>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pr3.App</mainClass>
+                                </manifest>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <!-- Make this jar executable -->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<version>3.0.2</version>-->
+                <!--<configuration>-->
+                    <!--&lt;!&ndash; DO NOT incllog4j2.propertiesties file in your Jar &ndash;&gt;-->
+                    <!--&lt;!&ndash;<excludes>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<excludelog4j2.propertiesties</exclude>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</excludes>&ndash;&gt;-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<addClasspath>true</addClasspath>-->
+                            <!--&lt;!&ndash; Jar file entry point &ndash;&gt;-->
+                            <!--<mainClass>pr3.App</mainClass>-->
+                            <!--<packageName>pr3</packageName>-->
+                            <!--<addClasspath>true</addClasspath>-->
+                            <!--<classpathPrefix>lib/</classpathPrefix>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<version></version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>copy-dependencies</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy-dependencies</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<includeScope>compile</includeScope>-->
+                            <!--<outputDirectory>${project.build.directory}/lib</outputDirectory>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
             <!-- Includes the runtime dependencies -->
-            <plugin>
-                <groupId>org.dstovall</groupId>
-                <artifactId>onejar-maven-plugin</artifactId>
-                <version>LATEST</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>one-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.dstovall</groupId>-->
+                <!--<artifactId>onejar-maven-plugin</artifactId>-->
+                <!--<version>LATEST</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>one-jar</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
         </plugins>
     </build>
 
     <!-- One-Jar is in the googlecode repository -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <!--<pluginRepositories>-->
+        <!--<pluginRepository>-->
+            <!--<id>onejar-maven-plugin.googlecode.com</id>-->
+            <!--<url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>-->
+        <!--</pluginRepository>-->
+    <!--</pluginRepositories>-->
 </project>
