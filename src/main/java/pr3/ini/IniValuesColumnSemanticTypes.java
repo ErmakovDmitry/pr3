@@ -11,27 +11,33 @@ import java.util.List;
 @XmlRootElement(name="ColumnSemanticTypes")
 public class IniValuesColumnSemanticTypes {
 
-    private List<IniValuesColumnSemanticType> iniValuesColumnSemanticTypes;
+    private List<IniValuesColumnSemanticType> iniValuesColumnSemanticTypeList;
 
     @XmlElement(name="ColumnSemanticType")
-    public List<IniValuesColumnSemanticType> getIniValuesColumnSemanticTypes() {
-        return iniValuesColumnSemanticTypes;
+    public List<IniValuesColumnSemanticType> getIniValuesColumnSemanticTypeList() {
+        return iniValuesColumnSemanticTypeList;
     }
 
-    public void setIniValuesColumnSemanticTypes(List<IniValuesColumnSemanticType> iniValuesColumnSemanticTypes) {
-        this.iniValuesColumnSemanticTypes = iniValuesColumnSemanticTypes;
+    public void setIniValuesColumnSemanticTypeList(List<IniValuesColumnSemanticType> iniValuesColumnSemanticTypeList) {
+        this.iniValuesColumnSemanticTypeList = iniValuesColumnSemanticTypeList;
     }
 
     public String asString() {
-        return "IniValuesColumnSemanticTypes {" +
-                "\n\t\tiniValuesColumnSemanticTypes='" + iniValuesColumnSemanticTypes + '\'' +
-                "\n\t}";
+        String res = "IniValuesColumnSemanticTypes {";
+        res += "\n\t\t\tiniValuesColumnSemanticTypeList=[";
+        for (IniValuesColumnSemanticType itm : iniValuesColumnSemanticTypeList) {
+            res += "\n\t\t\t\t" + itm.asString();
+        }
+        res += "\n\t\t\t]";
+        res += "\n\t\t}";
+
+        return res;
     }
 
     @Override
     public String toString() {
         return "IniValuesColumnSemanticTypes{" +
-                "iniValuesColumnSemanticTypes=" + iniValuesColumnSemanticTypes +
+                "iniValuesColumnSemanticTypeList=" + iniValuesColumnSemanticTypeList +
                 '}';
     }
 }

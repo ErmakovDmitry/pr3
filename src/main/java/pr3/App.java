@@ -64,85 +64,6 @@ public class App {
      */
     public static IniValues iniValues;
 
-//    public static final String LOG_PATTERN = "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n";
-    public static final String LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %c - %msg%n";
-//    SIMPLE_CONVERSION_PATTERN = "%d [%t] %p %c - %m%n"
-
-    public static void configLog(IniValuesLog iniValuesLog) {
-
-//        String dir = System.getProperty("java.io.tmpdir") + "test\\";
-        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        final Configuration config = ctx.getConfiguration();
-//        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN).build();
-        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(LOG_PATTERN).build();
-        TriggeringPolicy policy = CompositeTriggeringPolicy.createPolicy(
-                SizeBasedTriggeringPolicy.createPolicy("1 M"),
-                OnStartupTriggeringPolicy.createPolicy(1)
-        );
-        final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy(
-                "9"
-                , "1"
-                , "max"
-                , Deflater.NO_COMPRESSION + ""
-                , null
-                , true
-                , config
-        );
-
-        String logFilePath = iniValuesLog.getDirName();
-//        String PR3_LOGGER_NAME = "pr3";
-//        String FILE_PATTERN_LAYOUT = "%n[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%l]%n\t%m%n%n";
-        String LOG_FILE_NAME = iniValuesLog.getFileName(); // "pr3.log";
-        String LOG_FILE_NAME_PATTERN = iniValuesLog.getFileNamePattern(); // "pr3_%d{yyyy-MM-dd}_%i.log";
-
-        Appender fileAppender = RollingFileAppender.newBuilder()
-                .withAdvertise(Boolean.parseBoolean(null))
-                .withAdvertiseUri(null)
-                .withAppend(true)
-                .withBufferedIo(true)
-                .withBufferSize(8192)
-                .setConfiguration(config)
-                .withFileName(logFilePath + LOG_FILE_NAME)
-                .withFilePattern(logFilePath + LOG_FILE_NAME_PATTERN)
-                .withFilter(null)
-                .withIgnoreExceptions(true)
-                .withImmediateFlush(true)
-                .withLayout(layout)
-                .withCreateOnDemand(false)
-                .withLocking(false)
-                .withName("File")
-                .withPolicy(policy)
-                .withStrategy(strategy)
-                .build();
-        fileAppender.start();
-
-        Appender consoleAppender = ConsoleAppender.newBuilder().withName("console").build();
-        consoleAppender.start();
-
-        config.addAppender(fileAppender);
-        config.addAppender(consoleAppender);
-
-        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.ALL, null);
-        AppenderRef refConsole = AppenderRef.createAppenderRef("console", Level.ALL, null);
-        AppenderRef[] refs = new AppenderRef[] { ref, refConsole };
-
-        LoggerConfig loggerConfig = LoggerConfig.createLogger(
-                true
-                , Level.ALL
-                , LogManager.ROOT_LOGGER_NAME
-                , "true"
-                ,  refs
-                , null
-                , config
-                , null
-
-        );
-        loggerConfig.addAppender(fileAppender, Level.ALL, null);
-        loggerConfig.addAppender(consoleAppender, Level.ALL, null);
-
-        config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
-        ctx.updateLoggers();
-    }
 
     public static void main(String[] args)   {
 
@@ -233,7 +154,8 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
             logger.info(iniValues.asString());
 
-            ColumnSemanticType.init();
+            // Инициализация элементов enum ключевыми словами для распознавания типов
+            ColumnSemanticType.init(iniValues.getIniValuesParser().getIniValuesColumnSemanticTypes());
 
             FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
             logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
@@ -280,18 +202,17 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                     xlsParser.parseFile();
                 } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
                     logger.log(Level.ERROR, "Файл НЕ обработан, т.к. произошло исключение!", e);
-    //                e.printStackTrace();
                 }
 
                 logger.info("---------------------------------------");
                 logger.info("Обработка файла: " + path + " закончена");
             });
         } catch (XmlIniFileException e) {
-            throw new RuntimeException(e.getLocalizedMessage());
+            logger.error("Ошибка при обработке XmlIni-файла", e);
         } catch (FileNameException e) {
-            e.printStackTrace();
+            logger.error("Ошибка при обработке имени файла", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Ошибка ввода/вывода", e);
         }
 
 /*
@@ -360,6 +281,85 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 */
     }
 
+    /**
+     * Конфигурирование логгера
+     * @param iniValuesLog Параметры логгирования
+     */
+    public static void configLog(IniValuesLog iniValuesLog) {
+
+//        String dir = System.getProperty("java.io.tmpdir") + "test\\";
+        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        final Configuration config = ctx.getConfiguration();
+        final PatternLayout layout = PatternLayout.newBuilder()
+                .withConfiguration(config)
+                .withPattern(iniValuesLog.getLogPattern())
+                .build();
+        TriggeringPolicy policy = CompositeTriggeringPolicy.createPolicy(
+                SizeBasedTriggeringPolicy.createPolicy("1 M"),
+                OnStartupTriggeringPolicy.createPolicy(1)
+        );
+        final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy(
+                "9"
+                , "1"
+                , "max"
+                , Deflater.NO_COMPRESSION + ""
+                , null
+                , true
+                , config
+        );
+
+        String logFilePath = iniValuesLog.getDirName();
+
+        Appender fileAppender = RollingFileAppender.newBuilder()
+                .withAdvertise(Boolean.parseBoolean(null))
+                .withAdvertiseUri(null)
+                .withAppend(true)
+                .withBufferedIo(true)
+                .withBufferSize(8192)
+                .setConfiguration(config)
+                .withFileName(logFilePath + iniValuesLog.getFileName())
+                .withFilePattern(logFilePath + iniValuesLog.getFileNamePattern())
+                .withFilter(null)
+                .withIgnoreExceptions(true)
+                .withImmediateFlush(true)
+                .withLayout(layout)
+                .withCreateOnDemand(false)
+                .withLocking(false)
+                .withName("File")
+                .withPolicy(policy)
+                .withStrategy(strategy)
+                .build();
+        fileAppender.start();
+
+        Appender consoleAppender = ConsoleAppender.newBuilder()
+                .withName("console")
+                .build();
+        consoleAppender.start();
+
+        config.addAppender(fileAppender);
+        config.addAppender(consoleAppender);
+
+        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.ALL, null);
+        AppenderRef refConsole = AppenderRef.createAppenderRef("console", Level.ALL, null);
+        AppenderRef[] refs = new AppenderRef[] { ref, refConsole };
+
+        LoggerConfig loggerConfig = LoggerConfig.createLogger(
+                true
+                , Level.ALL
+                , LogManager.ROOT_LOGGER_NAME
+                , "true"
+                ,  refs
+                , null
+                , config
+                , null
+
+        );
+        loggerConfig.addAppender(fileAppender, Level.ALL, null);
+        loggerConfig.addAppender(consoleAppender, Level.ALL, null);
+
+        config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
+        ctx.updateLoggers();
+    }
 
 }
 

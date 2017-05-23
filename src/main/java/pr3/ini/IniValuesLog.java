@@ -23,6 +23,10 @@ public class IniValuesLog {
      */
     private String fileNamePattern;
 
+    /**
+     * Шаблон строки ввода
+     */
+    private String logPattern;
 
     public String getDirName() {
         return dirName;
@@ -51,11 +55,21 @@ public class IniValuesLog {
         this.fileNamePattern = fileNamePattern;
     }
 
+    public String getLogPattern() {
+        return logPattern;
+    }
+
+    @XmlAttribute(name="LOG_PATTERN", required = true)
+    public void setLogPattern(String logPattern) {
+        this.logPattern = logPattern;
+    }
+
     public String asString() {
         return "IniValuesLog {" +
                 "\n\t\tdirName='" + dirName + '\'' +
                 "\n\t\tfileName='" + fileName + '\'' +
                 "\n\t\tfileNamePattern='" + fileNamePattern + '\'' +
+                "\n\t\tlogPattern='" + logPattern + '\'' +
                 "\n\t}";
     }
 
@@ -65,6 +79,7 @@ public class IniValuesLog {
                 "dirName='" + dirName + '\'' +
                 ", fileName='" + fileName + '\'' +
                 ", fileNamePattern='" + fileNamePattern + '\'' +
+                ", logPattern='" + logPattern + '\'' +
                 '}';
     }
 }

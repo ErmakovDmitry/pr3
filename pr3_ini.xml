@@ -7,21 +7,22 @@
 	LOG_BATCH_COUNT_IN_LINE = "5">
 	<!-- Log params -->
 	<Log
-		DIR_NAME = "/home/dmitry/IdeaProjects/pr3/log/"
-		DIR_NAME1 = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
+		DIR_NAME1 = "/home/dmitry/IdeaProjects/pr3/log/"
+		DIR_NAME = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
 		FILE_NAME = "pr3.log"
-		FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log">
+		FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log"
+		LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %c - %msg%n">
 	</Log>
 	<!-- Source directory with xls-files -->
 	<Src
-		DIR_NAME = "/home/hddraid/TMP/5/"
-		DIR_NAME1 = "C:\Users\Дмитрий\TMP\5\">
+		DIR_NAME1 = "/home/hddraid/TMP/5/"
+		DIR_NAME = "C:\Users\Дмитрий\TMP\5\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
-		FILE_NAME = "/home/hddraid/TMP/5/res.xlsx"
-		FILE_NAME1 = "C:\Users\Дмитрий\TMP\5\res.xlsx">
+		FILE_NAME1 = "/home/hddraid/TMP/5/res.xlsx"
+		FILE_NAME = "C:\Users\Дмитрий\TMP\5\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb
@@ -33,39 +34,40 @@
 		USER = "gpermakov"
 		PASS = "Eranti&#038;367">
 	</OutDb>
+	<!-- Parser configuration -->
 	<Parser>
 		<ColumnSemanticTypes>
-			<ColumnSemanticType TYPE="ARTICLE">
+			<ColumnSemanticType NAME="ARTICLE">
 				<KeyWords>
 					<KeyWord VALUE="артикул" />
 					<KeyWord VALUE="для заказа" />
 				</KeyWords>
 			</ColumnSemanticType>
-			<ColumnSemanticType TYPE="NUMBER">
+			<ColumnSemanticType NAME="NUMBER">
 				<KeyWords>
 					<KeyWord VALUE="номер" />
 					<KeyWord VALUE="номенклат" />
 				</KeyWords>
 			</ColumnSemanticType>
-			<ColumnSemanticType TYPE="NAME">
+			<ColumnSemanticType NAME="NAME">
 				<KeyWords>
 					<KeyWord VALUE="наимен" />
 					<KeyWord VALUE="назв" />
 				</KeyWords>
 			</ColumnSemanticType>
-			<ColumnSemanticType TYPE="UNIT">
+			<ColumnSemanticType NAME="UNIT">
 				<KeyWords>
 					<KeyWord VALUE="един" />
 					<KeyWord VALUE="измер" />
 				</KeyWords>
 			</ColumnSemanticType>
-			<ColumnSemanticType TYPE="PRICE">
+			<ColumnSemanticType NAME="PRICE">
 				<KeyWords>
 					<KeyWord VALUE="цена" />
 					<KeyWord VALUE="стоим" />
 				</KeyWords>
 			</ColumnSemanticType>
-			<ColumnSemanticType TYPE="DESCRIPTION">
+			<ColumnSemanticType NAME="DESCRIPTION">
 				<KeyWords>
 					<KeyWord VALUE="полное" />
 					<KeyWord VALUE="опис" />
@@ -73,22 +75,4 @@
 			</ColumnSemanticType>
 		</ColumnSemanticTypes>
 	</Parser>
-	<!--<TABLES_TO_CONV>-->
-		<!--<TABLE_TO_CONV name="fact">-->
-			<!--<SQL><![CDATA[-->
-				<!--SELECT num,name, CAST(null AS BLOB) AS picture, '' AS enabl FROM factory WHERE num<10-->
-			<!--]]></SQL>-->
-		<!--</TABLE_TO_CONV>-->
-		<!--<TABLE_TO_CONV name="factory">-->
-			<!--<SQL><![CDATA[-->
-				<!--SELECT num,name, CAST(null AS BLOB) AS picture, '' AS enabl FROM factory WHERE num<10-->
-			<!--]]></SQL>-->
-		<!--</TABLE_TO_CONV>-->
-		<!--<TABLE_TO_CONV name="family">-->
-			<!--<SQL><![CDATA[-->
-				 <!--SELECT * FROM family;-->
-			<!--]]></SQL>-->
-		<!--</TABLE_TO_CONV>-->
-		<!--<TABLE_TO_CONV name="regions" />-->
-	<!--</TABLES_TO_CONV>-->
 </Pr3IniValues>

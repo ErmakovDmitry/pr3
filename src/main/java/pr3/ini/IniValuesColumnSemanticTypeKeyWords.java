@@ -21,6 +21,18 @@ public class IniValuesColumnSemanticTypeKeyWords {
         this.keyWords = keyWords;
     }
 
+    public String asString() {
+        String res = "IniValuesColumnSemanticTypeKeyWords {";
+        res += "\n\t\t\t\t\t\tkeyWords=[";
+        for (IniValuesColumnSemanticTypeKeyWord itm : keyWords) {
+            res += "\n\t\t\t\t\t\t\t" + itm.asString();
+        }
+        res += "\n\t\t\t\t\t\t]";
+        res += "\n\t\t\t\t\t}";
+
+        return res;
+    }
+
     @Override
     public String toString() {
         return "IniValuesColumnSemanticTypeKeyWords{" +

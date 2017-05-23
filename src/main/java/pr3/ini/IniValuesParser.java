@@ -23,8 +23,14 @@ public class IniValuesParser {
 
     public String asString() {
         return "IniValuesParser {" +
-                "\n\t\tiniValuesColumnSemanticTypes='" + iniValuesColumnSemanticTypes.asString() + '\'' +
+                "\n\t\tiniValuesColumnSemanticTypes=" + iniValuesColumnSemanticTypes.asString() +
                 "\n\t}";
     }
 
+    @Override
+    public String toString() {
+        return "IniValuesParser{" +
+                "iniValuesColumnSemanticTypes=" + iniValuesColumnSemanticTypes +
+                '}';
+    }
 }
