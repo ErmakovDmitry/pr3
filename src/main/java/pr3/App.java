@@ -31,14 +31,11 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.Booleans;
 import org.apache.logging.log4j.core.util.Integers;
 import org.apache.logging.log4j.status.StatusLogger;
-import pr3.ini.IniValues;
-import pr3.ini.MPLoggingConfiguration;
-import pr3.ini.XmlIniFileException;
+import pr3.ini.*;
 import pr3.utils.FileName;
 import pr3.utils.FileNameException;
 import pr3.xls.ColumnSemanticType;
 import pr3.xls.XLSParser;
-import pr3.ini.XmlIniFile;
 import pr3.xls.XLSWorkbookException;
 
 import java.io.Console;
@@ -67,82 +64,36 @@ public class App {
      */
     public static IniValues iniValues;
 
-//    public static final String LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5level] MyApp - %msg%n";
-    public static final String LOG_PATTERN = "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n";
+//    public static final String LOG_PATTERN = "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n";
+    public static final String LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %c - %msg%n";
+//    SIMPLE_CONVERSION_PATTERN = "%d [%t] %p %c - %m%n"
 
-
-    public static <B extends FileAppender.Builder<B>> FileAppender createAppender(
-            final String fileName,
-            final Layout<? extends Serializable> layout,
-            final Configuration config) {
-        return FileAppender.<B>newBuilder()
-                .setConfiguration(config)
-                .withFileName(fileName)
-//                .withAppend(true)
-//                .withLocking(true)
-                .withName("File")
-//                .withImmediateFlush(true)
-//                .withIgnoreExceptions(false)
-//                .withBufferedIo(false)
-//                .withBufferSize(8192)
-                .withLayout(layout)
-//                .withFilter(null)
-//                .withAdvertise(false)
-//                .withAdvertiseUri(null)
-                .build();
-    }
-
-    public static void initLogFile(String path, Level level){
-
-        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        final Configuration config = ctx.getConfiguration();
-        Layout layout = PatternLayout.newBuilder().withPattern(LOG_PATTERN).withConfiguration(config).build();
-
-        Appender appender = createAppender(path, layout, config);
-
-        appender.start();
-        config.addAppender(appender);
-//        AppenderRef ref = AppenderRef.createAppenderRef("File", null, null);
-//        AppenderRef[] refs = new AppenderRef[] {ref};
-        LoggerConfig loggerConfig = config.getLoggerConfig("pr3");
-        loggerConfig.addAppender(appender, null, null);
-        ctx.updateLoggers();
-    }
-
-//    https://stackoverflow.com/questions/26119795/how-to-do-programmatic-configuration-for-log4j2-rollingfileappender
-//    RollingFileAppender.createAppender(dir + "log\\test.log", dir + "log\\test-%i.log",
-//            "true", "File", "false", "128", "true", policy, strategy, layout, (Filter) null, "false", "false", (String) null, config);
-    public static void configLog() {
-//        PatternLayout layout = PatternLayout.createDefaultLayout();
-
+    public static void configLog(IniValuesLog iniValuesLog) {
 
 //        String dir = System.getProperty("java.io.tmpdir") + "test\\";
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         final Configuration config = ctx.getConfiguration();
-        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN).build();
+//        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN).build();
+        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(LOG_PATTERN).build();
         TriggeringPolicy policy = CompositeTriggeringPolicy.createPolicy(
-                SizeBasedTriggeringPolicy.createPolicy("3 M"),
-                OnStartupTriggeringPolicy.createPolicy(1));
-        final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy("9", "1", "max", Deflater.NO_COMPRESSION + "", null, true, config);
-//        DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy("10", "0", null, null, null, false, config);
-//        RollingFileManager fileManager = RollingFileManager.getFileManager(
-//                dir + "log\\test.log"
-//                 , dir + "log\\test-%i.log"
-//                , false
-//                , false
-//                , policy, strategy
-//                , null
-//                , layout
-//                , 128
-//        );
-//        policy.initialize(fileManager);
-//        RollingFileAppender appender = RollingFileAppender.createAppender(dir + "log\\test.log", dir + "log\\test-%i.log",
-//                "false", "File", "false", "128", "true", policy, strategy, layout, (Filter) null, "false", "false", (String) null, config);
-        String logFilePath = "C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\log\\";
-        String PR3_LOGGER_NAME = "pr3";
-        String FILE_PATTERN_LAYOUT = "%n[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%l]%n\t%m%n%n";
-        String LOG_FILE_NAME = "pr3.log";
-        String LOG_FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log";
+                SizeBasedTriggeringPolicy.createPolicy("1 M"),
+                OnStartupTriggeringPolicy.createPolicy(1)
+        );
+        final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy(
+                "9"
+                , "1"
+                , "max"
+                , Deflater.NO_COMPRESSION + ""
+                , null
+                , true
+                , config
+        );
+
+        String logFilePath = iniValuesLog.getDirName();
+//        String PR3_LOGGER_NAME = "pr3";
+//        String FILE_PATTERN_LAYOUT = "%n[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%l]%n\t%m%n%n";
+        String LOG_FILE_NAME = iniValuesLog.getFileName(); // "pr3.log";
+        String LOG_FILE_NAME_PATTERN = iniValuesLog.getFileNamePattern(); // "pr3_%d{yyyy-MM-dd}_%i.log";
 
         Appender fileAppender = RollingFileAppender.newBuilder()
                 .withAdvertise(Boolean.parseBoolean(null))
@@ -165,20 +116,28 @@ public class App {
                 .build();
         fileAppender.start();
 
-//        ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
         Appender consoleAppender = ConsoleAppender.newBuilder().withName("console").build();
         consoleAppender.start();
 
         config.addAppender(fileAppender);
         config.addAppender(consoleAppender);
 
-        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.INFO, null);
+        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.ALL, null);
         AppenderRef refConsole = AppenderRef.createAppenderRef("console", Level.ALL, null);
         AppenderRef[] refs = new AppenderRef[] { ref, refConsole };
 
-        LoggerConfig loggerConfig = LoggerConfig.createLogger("true", Level.ALL, LogManager.ROOT_LOGGER_NAME, "true",
-                refs, null, config, null);
-        loggerConfig.addAppender(fileAppender, Level.INFO, null);
+        LoggerConfig loggerConfig = LoggerConfig.createLogger(
+                true
+                , Level.ALL
+                , LogManager.ROOT_LOGGER_NAME
+                , "true"
+                ,  refs
+                , null
+                , config
+                , null
+
+        );
+        loggerConfig.addAppender(fileAppender, Level.ALL, null);
         loggerConfig.addAppender(consoleAppender, Level.ALL, null);
 
         config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
@@ -197,8 +156,7 @@ https://stackoverflow.com/questions/30881990/how-to-configure-log4j-2-x-purely-p
     loggerContext.reconfigure();
 LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 */
-configLog();
-        logger.info("////////////////////////");
+
 //        initLogFile("/home/dmitry/IdeaProjects/pr3/log/zpr3_%d{yyyy-MM-dd HH:mm:ss}_%i.log", Level.ALL);
 //        initLogFile("C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\zpr3_%d{yyyy-MM-dd HH:mm:ss}_%i.log", Level.ALL);
 //        initLogFile("C:\\Users\\Дмитрий\\IdeaProjects\\pr3\\log\\zpr3.log", Level.ALL);
@@ -245,8 +203,6 @@ configLog();
 //        }
 //        exit(0);
 
-        ColumnSemanticType.init();
-
 //        String jarName = new java.io.File(FileName.class.getProtectionDomain()
 //                .getCodeSource()
 //                .getLocation()
@@ -261,10 +217,6 @@ configLog();
         try {
 
             FileName iniFileName = new FileName(args[0]);
-            // C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
-            // /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
-            logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
-
             if (!iniFileName.getExtension().equalsIgnoreCase("xml")) {
                 throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml, а не " + iniFileName.getExtension());
             }
@@ -272,62 +224,68 @@ configLog();
             // Загрузка настроек из xml-файла
             XmlIniFile xmlIniFile = new XmlIniFile();
             iniValues = xmlIniFile.load(iniFileName.getFullNameWithDir(), IniValues.class);
+
+            // Инициализация логгирования
+            configLog(iniValues.getIniValuesLog());
+
+            // Эти вызовы идут после инициализации логгирования, иначе не попадают в лог
+            logger.info("////////////////////////");
+            logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
             logger.info(iniValues.asString());
 
-//            String srcDirName = iniValues.getSrcDirName();
-            String srcDirName = iniValues.getIniValuesSrc().getDirName();
+            ColumnSemanticType.init();
 
             FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
             logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
 
-
+//            String srcDirName = iniValues.getSrcDirName();
+            String srcDirName = iniValues.getIniValuesSrc().getDirName();
             logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
 
-        // Рекурсивный перебор фйайлов в каталоге-источнике
-        Files.find(
-            Paths.get(srcDirName),
-            Integer.MAX_VALUE,
-//            (filePath, fileAttr) -> fileAttr.isRegularFile()
-            (path, basicFileAttributes) -> {
-                if (basicFileAttributes.isRegularFile()) {
-//                    logger.debug("path:"+path);
-                    try {
-                        FileName srcFileName = new FileName(path.toString());
-                        String nameWithoutExtension = srcFileName.getNameWithoutExtension();
-                        String fileExtension = srcFileName.getExtension();
+            // Рекурсивный перебор фйайлов в каталоге-источнике
+            Files.find(
+                Paths.get(srcDirName),
+                Integer.MAX_VALUE,
+//                (filePath, fileAttr) -> fileAttr.isRegularFile()
+                (path, basicFileAttributes) -> {
+                    if (basicFileAttributes.isRegularFile()) {
+//                        logger.debug("path:"+path);
+                        try {
+                            FileName srcFileName = new FileName(path.toString());
+                            String nameWithoutExtension = srcFileName.getNameWithoutExtension();
+                            String fileExtension = srcFileName.getExtension();
 
-                        if (
-                            // Отбираем только файлы Excel
-                            (fileExtension.equalsIgnoreCase("xls") || fileExtension.equalsIgnoreCase("xlsx"))
-                            // Отсеиваем временные файлы LibreOffice
-                            && (! ".".equals(nameWithoutExtension.substring(0,1)))
-                            // Проверка, что не пытаемся обрабатывать выходной файл
-                            && (!srcFileName.getFullNameWithoutDir().equalsIgnoreCase(xlsOutFileName.getFullNameWithoutDir()))
-                            ) {
-
-                            return true;
+                            if (
+                                // Отбираем только файлы Excel
+                                (fileExtension.equalsIgnoreCase("xls") || fileExtension.equalsIgnoreCase("xlsx"))
+                                // Отсеиваем временные файлы LibreOffice
+                                && (! ".".equals(nameWithoutExtension.substring(0,1)))
+                                // Проверка, что не пытаемся обрабатывать выходной файл
+                                && (!srcFileName.getFullNameWithoutDir().equalsIgnoreCase(xlsOutFileName.getFullNameWithoutDir()))
+                                ) {
+                                return true;
+                            }
+                        } catch (Exception e) {
+                            logger.log(Level.ERROR, "Iterate files", e);
                         }
-                    } catch (Exception e) {
-                        logger.log(Level.ERROR, "Iterate files", e);
                     }
+                    return false;
                 }
-                return false;
-            }
-        ).forEach(path -> {
-            logger.info("Обработка файла: " + path);
-//            FileName srcFileName = null;
-            try {
-                FileName srcFileName = new FileName(path.toString());
-                XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
-                xlsParser.parseFile();
-            } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
-                logger.log(Level.ERROR, "Файл НЕ обработан, т.к. произошло исключение!", e);
-//                e.printStackTrace();
-            }
+            ).forEach(path -> {
+                logger.info("Обработка файла: " + path);
+    //            FileName srcFileName = null;
+                try {
+                    FileName srcFileName = new FileName(path.toString());
+                    XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
+                    xlsParser.parseFile();
+                } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
+                    logger.log(Level.ERROR, "Файл НЕ обработан, т.к. произошло исключение!", e);
+    //                e.printStackTrace();
+                }
 
-            logger.info("---------------------------------------");
-            logger.info("Обработка файла: " + path + " закончена");
-        });
+                logger.info("---------------------------------------");
+                logger.info("Обработка файла: " + path + " закончена");
+            });
         } catch (XmlIniFileException e) {
             throw new RuntimeException(e.getLocalizedMessage());
         } catch (FileNameException e) {

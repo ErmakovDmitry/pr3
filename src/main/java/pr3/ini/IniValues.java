@@ -37,6 +37,11 @@ public class IniValues {
 //	private String srcDirName;
 
 	/**
+	 * Настройки логгирования
+	 */
+	private	IniValuesLog iniValuesLog;
+
+	/**
 	 * Настройки доступа к входному каталогу с xls-файлами
 	 */
 	private	IniValuesSrc iniValuesSrc;
@@ -51,6 +56,10 @@ public class IniValues {
 	 */
 	private IniValuesOutDb iniValuesOutDb;
 
+	/**
+	 * Настройки парсера
+	 */
+	private IniValuesParser iniValuesParser;
 
 //	public String getSrcDirName() {
 //		return srcDirName;
@@ -60,6 +69,16 @@ public class IniValues {
 //	public void setSrcDirName(String srcDirName) {
 //		this.srcDirName = srcDirName;
 //	}
+
+
+	public IniValuesLog getIniValuesLog() {
+		return iniValuesLog;
+	}
+
+	@XmlElement(name="Log")
+	public void setIniValuesLog(IniValuesLog iniValuesLog) {
+		this.iniValuesLog = iniValuesLog;
+	}
 
 	public IniValuesSrc getIniValuesSrc() {
 		return iniValuesSrc;
@@ -86,6 +105,15 @@ public class IniValues {
 	@XmlElement(name="OutDb")
 	public void setIniValuesOutDb(IniValuesOutDb iniValuesOutDb) {
 		this.iniValuesOutDb = iniValuesOutDb;
+	}
+
+	public IniValuesParser getIniValuesParser() {
+		return iniValuesParser;
+	}
+
+	@XmlElement(name="Parser")
+	public void setIniValuesParser(IniValuesParser iniValuesParser) {
+		this.iniValuesParser = iniValuesParser;
 	}
 
 	//	/**
@@ -334,19 +362,22 @@ public class IniValues {
 
 	public String asString() {
 		return "IniValues {" +
-//				"\n\tsrcDirName='" + srcDirName + '\'' +
+				"\n\tiniValuesLog=" + iniValuesLog.asString() +
 				"\n\tiniValuesSrc=" + iniValuesSrc.asString() +
 				"\n\tiniValuesOutXls=" + iniValuesOutXls.asString() +
 				"\n\tiniValuesOutDb=" + iniValuesOutDb.asString() +
+				"\n\tiniValuesParser=" + iniValuesParser.asString() +
 				"\n}";
 	}
 
 	@Override
 	public String toString() {
 		return "IniValues{" +
-//				"srcDirName='" + srcDirName + '\'' +
-				", iniValuesOutXls='" + iniValuesOutXls + '\'' +
+				"iniValuesLog=" + iniValuesLog +
+				", iniValuesSrc=" + iniValuesSrc +
+				", iniValuesOutXls=" + iniValuesOutXls +
 				", iniValuesOutDb=" + iniValuesOutDb +
+				", iniValuesParser=" + iniValuesParser +
 				'}';
 	}
 

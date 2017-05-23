@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Смысловое значение колонки
+ * Смысловое значение колонки xls-файла для парсера
  * Created by dmitry on 03.05.17.
  */
 public enum ColumnSemanticType {
