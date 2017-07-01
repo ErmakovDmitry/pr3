@@ -1,0 +1,2 @@
+Команда запуска в Windows
+java -jar pr3-1.0.1-jar-with-dependencies.jar C:\Users\Дмитрий\IdeaProjects\pr3\pr3_ini.xml
