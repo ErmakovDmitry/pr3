@@ -42,9 +42,12 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.zip.Deflater;
+
+import static java.lang.System.exit;
 
 /**
  * Created by dmitry on 25.04.17.
@@ -160,11 +163,23 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
             logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
 
-//            String srcDirName = iniValues.getSrcDirName();
+            Path xlsOutFilePath = Paths.get(xlsOutFileName.getFullNameWithDir());
+
+            if (Files.exists(xlsOutFilePath)) {
+                if (Files.isRegularFile(xlsOutFilePath)) {
+                    Files.deleteIfExists(xlsOutFilePath);
+                    logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir() + " удален");
+                } else {
+                    logger.error("Имя выходного xls-файла занято, видимо, каталогом");
+                    exit(1);
+                }
+            }
+
+            // Каталог с исходными файлами
             String srcDirName = iniValues.getIniValuesSrc().getDirName();
-            logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
 
             // Рекурсивный перебор фйайлов в каталоге-источнике
+            logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
             Files.find(
                 Paths.get(srcDirName),
                 Integer.MAX_VALUE,
