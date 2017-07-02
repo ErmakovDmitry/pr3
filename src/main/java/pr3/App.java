@@ -157,14 +157,15 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
             logger.info(iniValues.asString());
 
-            // Инициализация элементов enum ключевыми словами для распознавания типов
+            // Инициализация элементов enum ключевыми словами для распознавания смысловых типов колонок
             ColumnSemanticType.init(iniValues.getIniValuesParser().getIniValuesColumnSemanticTypes());
 
+            // Имя выходного файла
             FileName xlsOutFileName = new FileName(iniValues.getIniValuesOutXls().getFileName());
             logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir());
 
+            // Удаление выходного файла, если он существовал
             Path xlsOutFilePath = Paths.get(xlsOutFileName.getFullNameWithDir());
-
             if (Files.exists(xlsOutFilePath)) {
                 if (Files.isRegularFile(xlsOutFilePath)) {
                     Files.deleteIfExists(xlsOutFilePath);
@@ -183,7 +184,6 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             Files.find(
                 Paths.get(srcDirName),
                 Integer.MAX_VALUE,
-//                (filePath, fileAttr) -> fileAttr.isRegularFile()
                 (path, basicFileAttributes) -> {
                     if (basicFileAttributes.isRegularFile()) {
 //                        logger.debug("path:"+path);
@@ -203,14 +203,13 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                                 return true;
                             }
                         } catch (Exception e) {
-                            logger.log(Level.ERROR, "Iterate files", e);
+                            logger.log(Level.ERROR, "Перебор файлов", e);
                         }
                     }
                     return false;
                 }
             ).forEach(path -> {
                 logger.info("Обработка файла: " + path);
-    //            FileName srcFileName = null;
                 try {
                     FileName srcFileName = new FileName(path.toString());
                     XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);

@@ -8,6 +8,11 @@ import java.util.ArrayList;
  */
 public class ResRow implements Cloneable  {
 
+    /**
+     * Номер строки в исходном файле
+     */
+    private Integer srcRowNum;
+
     private ArrayList<String> parentsArrList = new ArrayList<>();
     private ArrayList<String> articlesArrList = new ArrayList<>();
     private ArrayList<String> numbersArrList = new ArrayList<>();
@@ -18,6 +23,14 @@ public class ResRow implements Cloneable  {
     private String otherVals;
 
     public ResRow() {
+    }
+
+    public Integer getSrcRowNum() {
+        return srcRowNum;
+    }
+
+    public void setSrcRowNum(Integer srcRowNum) {
+        this.srcRowNum = srcRowNum;
     }
 
     public ArrayList<String> getParentsArrList() {
@@ -77,6 +90,7 @@ public class ResRow implements Cloneable  {
     @Override
     public String toString() {
         return "ResRow{" +
+                "\n\t srcRowNum=" + srcRowNum +
                 "\n\t parentsArrList=" + parentsArrList +
                 "\n\t articlesArrList=" + articlesArrList +
                 "\n\t numbersArrList=" + numbersArrList +

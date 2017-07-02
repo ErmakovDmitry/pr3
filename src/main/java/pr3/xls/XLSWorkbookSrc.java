@@ -30,20 +30,15 @@ import java.util.*;
  */
 public class XLSWorkbookSrc extends XLSWorkbook {
 
+	/**
+	 * Логгер класса
+	 */
 	final static Logger logger = LogManager.getLogger(XLSWorkbookSrc.class.getName());
 
-//	private String insCompanyName;
-//
-//	private String[] headerCells = {
-//		"Экономический  регион"
-//		,"Марка ТС"
-//		,"Количество СТОА"
-//		,"Cредняя стоимость нормочаса, руб."
-//		,"Количество СТОА"
-//		,"Cредняя стоимость нормочаса, руб."
-//		,"Количество СТОА"
-//		,"Cредняя стоимость нормочаса, руб."
-//	};
+	/**
+	 * Количество строк исходного файла, обрабатываемого парсером, или null, чтобы парсить всё
+	 */
+	final static Integer MAX_ROWS_TO_PARSE = null;
 
 	/**
 	 * Локализация настроек программы
@@ -385,6 +380,11 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
 
+		// Если существует объект для выходной xls-книга, пишем в нее строку-заголовок с именами полей из базы данных
+		if (XLSWorkbookOut != null) {
+			XLSWorkbookOut.addHeaderRow();
+		}
+
 		logger.info("dataRowsProcessing ////////////////////////////////////////////////////////////////");
 
 		Stack<String> outlineStack = new Stack<>();
@@ -420,12 +420,11 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 				// Результирующая (выходная) запись
 				ResRow resRow = new ResRow();
-
+				resRow.setSrcRowNum(dataCurRowInd + 1);
 //				// Признак непрерывного с начала заполнения ячеек строки
 //				// Предполагается, что непервые строки заголовка будут заполняться с дырами
 //				// Непрерывное заполнение - признак группирующих подзаголовков
 //				boolean rowContiniousFilling = true;
-
 
 				// Текущая ячейка в итераторе
 				Cell cell;
@@ -570,7 +569,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 					logger.info("--------------");
 				}
 
-				if (dataCurRowInd > 20) break;
+				if (MAX_ROWS_TO_PARSE != null && dataCurRowInd > MAX_ROWS_TO_PARSE) break;
 			}
 		}
 
