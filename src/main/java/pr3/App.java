@@ -31,6 +31,9 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.Booleans;
 import org.apache.logging.log4j.core.util.Integers;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import pr3.ini.*;
 import pr3.utils.FileName;
 import pr3.utils.FileNameException;
@@ -38,9 +41,7 @@ import pr3.xls.ColumnSemanticType;
 import pr3.xls.XLSParser;
 import pr3.xls.XLSWorkbookException;
 
-import java.io.Console;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,7 +69,7 @@ public class App {
     public static IniValues iniValues;
 
 
-    public static void main(String[] args)   {
+    public static void main(String[] args) {
 
 /*
 https://stackoverflow.com/questions/30881990/how-to-configure-log4j-2-x-purely-programmatically
@@ -134,12 +135,24 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 //                .getName();
 //        logger.debug(jarName);
 
-        if (args.length != 1) {
-            throw new RuntimeException("Usage: pr3.jar pr3_ini.xml");
-        }
+
 
         try {
+//            System.out.println(getClass().getPackage().getImplementationVersion());
 
+            // Читаем из pom.xml сведения о приложении
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            Model model = reader.read(new FileReader("pom.xml"));
+
+//        /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
+
+            String appNameAndVer = "\n" + model.getArtifactId() + " version \"" + model.getVersion() + "\"";
+            String appUsage = "\nUsage: pr3.jar pr3_ini.xml";
+            if (args.length != 1) {
+                throw new RuntimeException(appNameAndVer + appUsage);
+            }
+
+            // Получаем из командной строки имя xml-файла настроек
             FileName iniFileName = new FileName(args[0]);
             if (!iniFileName.getExtension().equalsIgnoreCase("xml")) {
                 throw new RuntimeException("файл настроек (" + iniFileName.getFullNameWithoutDir() + ") должен иметь расширение xml, а не " + iniFileName.getExtension());
@@ -227,6 +240,8 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             logger.error("Ошибка при обработке имени файла", e);
         } catch (IOException e) {
             logger.error("Ошибка ввода/вывода", e);
+        } catch (XmlPullParserException e) {
+            logger.error("Ошибка xml-парсера при чтении pom.xml", e);
         }
 
 /*
