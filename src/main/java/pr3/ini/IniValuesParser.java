@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class IniValuesParser {
 
     private IniValuesColumnSemanticTypes iniValuesColumnSemanticTypes;
+    private IniValuesOutColumns iniValuesOutColumns;
 
     @XmlElement(name="ColumnSemanticTypes")
     public IniValuesColumnSemanticTypes getIniValuesColumnSemanticTypes() {
@@ -21,9 +22,19 @@ public class IniValuesParser {
         this.iniValuesColumnSemanticTypes = iniValuesColumnSemanticTypes;
     }
 
+    @XmlElement(name="OutColumns")
+    public IniValuesOutColumns getIniValuesOutColumns() {
+        return iniValuesOutColumns;
+    }
+
+    public void setIniValuesOutColumns(IniValuesOutColumns iniValuesOutColumns) {
+        this.iniValuesOutColumns = iniValuesOutColumns;
+    }
+
     public String asString() {
         return "IniValuesParser {" +
                 "\n\t\tiniValuesColumnSemanticTypes=" + iniValuesColumnSemanticTypes.asString() +
+                "\n\t\tiniValuesOutColumns=" + iniValuesOutColumns.asString() +
                 "\n\t}";
     }
 
@@ -31,6 +42,7 @@ public class IniValuesParser {
     public String toString() {
         return "IniValuesParser{" +
                 "iniValuesColumnSemanticTypes=" + iniValuesColumnSemanticTypes +
+                ", iniValuesOutColumns=" + iniValuesOutColumns +
                 '}';
     }
 }

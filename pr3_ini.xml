@@ -7,22 +7,22 @@
 	LOG_BATCH_COUNT_IN_LINE = "5">
 	<!-- Log params -->
 	<Log
-		DIR_NAME1 = "/home/dmitry/IdeaProjects/pr3/log/"
-		DIR_NAME = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
+		DIR_NAME = "/home/dmitry/IdeaProjects/pr3/log/"
+		DIR_NAME1 = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
 		FILE_NAME = "pr3.log"
 		FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log"
 		LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %c - %msg%n">
 	</Log>
 	<!-- Source directory with xls-files -->
 	<Src
-		DIR_NAME1 = "/home/hddraid/TMP/5/"
-		DIR_NAME = "C:\Users\Дмитрий\TMP\5\">
+		DIR_NAME = "/home/hddraid/TMP/5/"
+		DIR_NAME1 = "C:\Users\Дмитрий\TMP\5\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
-		FILE_NAME1 = "/home/hddraid/TMP/5/res.xlsx"
-		FILE_NAME = "C:\Users\Дмитрий\TMP\5\res.xlsx">
+		FILE_NAME = "/home/hddraid/TMP/5/res.xlsx"
+		FILE_NAME1 = "C:\Users\Дмитрий\TMP\5\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb
@@ -74,5 +74,49 @@
 				</KeyWords>
 			</ColumnSemanticType>
 		</ColumnSemanticTypes>
+		<OutColumns>
+			<OutColumn NAME="plna_id" />
+			<OutColumn NAME="plna_source_type" />
+			<OutColumn NAME="plna_source_id" />
+			<OutColumn NAME="plna_row_num" />
+			<OutColumn NAME="plna_parent_rows_list" />
+			<OutColumn NAME="plna_diag_statcode" />
+			<OutColumn NAME="plna_date_from" />
+			<OutColumn NAME="plna_date_to" />
+			<OutColumn NAME="plna_item_text" />
+			<OutColumn NAME="plna_item_text_extra" />
+			<OutColumn NAME="plna_item_descr" />
+			<OutColumn NAME="plna_item_cat0" />
+			<OutColumn NAME="plna_item_cat1" />
+			<OutColumn NAME="plna_item_cat2" />
+			<OutColumn NAME="plna_item_cat3" />
+			<OutColumn NAME="plna_item_cat4" />
+			<OutColumn NAME="plna_item_currency" />
+			<OutColumn NAME="plna_currency_rate" />
+			<OutColumn NAME="plna_vat_rate" />
+			<OutColumn NAME="plna_units" />
+			<OutColumn NAME="plna_price_1" />
+			<OutColumn NAME="plna_price_rub_1" />
+			<OutColumn NAME="plna_price_many" />
+			<OutColumn NAME="plna_price_rub_many" />
+			<OutColumn NAME="plna_price_dealer" />
+			<OutColumn NAME="plna_price_rub_dealer" />
+			<OutColumn NAME="plna_price_dealer2" />
+			<OutColumn NAME="plna_price_rub_dealer2" />
+			<OutColumn NAME="plna_in_stock_state" />
+			<OutColumn NAME="plna_discount_proc" />
+			<OutColumn NAME="plna_brand" />
+			<OutColumn NAME="plna_seller" />
+			<OutColumn NAME="plna_article_code" />
+			<OutColumn NAME="plna_article_type" />
+			<OutColumn NAME="plna_article_code1" />
+			<OutColumn NAME="plna_item_code" />
+			<OutColumn NAME="plna_order_code" />
+			<OutColumn NAME="plna_minimal_order" />
+			<OutColumn NAME="plna_minimal_order_sum" />
+			<OutColumn NAME="plna_part_num" />
+			<OutColumn NAME="plna_extra_data" />
+			<OutColumn NAME="plna_sys_row_updated" />
+		</OutColumns>
 	</Parser>
 </Pr3IniValues>

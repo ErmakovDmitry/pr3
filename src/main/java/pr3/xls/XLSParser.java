@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pr3.db.OutDb;
 import pr3.ini.IniValues;
+import pr3.ini.IniValuesOutColumns;
 import pr3.ini.IniValuesOutDb;
 import pr3.ini.IniValuesOutXls;
 import pr3.utils.FileName;
@@ -48,8 +49,9 @@ public class XLSParser {
 		srcWb = new XLSWorkbookSrc(srcFileName, iniValues);
 
 		IniValuesOutXls iniValuesOutXls = iniValues.getIniValuesOutXls();
+		IniValuesOutColumns iniValuesOutColumns = iniValues.getIniValuesParser().getIniValuesOutColumns();
 		if (iniValuesOutXls.getEnabled()) {
-			resWb = new XLSWorkbookOut(outFileName);
+			resWb = new XLSWorkbookOut(outFileName, iniValuesOutColumns);
 		}
 
 		IniValuesOutDb iniValuesOutDb = iniValues.getIniValuesOutDb();
