@@ -114,16 +114,31 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @throws Exception
 	 */
 	public void parseSheet(Sheet srcSheet, XLSWorkbookOut xlsWorkbookOut, OutDb resDb) {
-		logger.info("Лист " + srcSheet.getSheetName());
+		logger.info("Лист '" + srcSheet.getSheetName() + "'");
 
-		// Определяем размер строк с данными в виде количества заполненных ячеек
-		Integer modaCellsCount = defineModaCellsCount(srcSheet);
+		if (srcSheet.getLastRowNum() > 0) {
+			// Определяем размер строк с данными в виде количества заполненных ячеек
+			Integer modaCellsCount = defineModaCellsCount(srcSheet);
 
-		// Определяем заголовок прайса, идентифицируем его колонки
-		PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
+			if (modaCellsCount != null) {
 
-		// Обрабатываем строки данных
-		dataRowsProcessing(srcSheet, modaCellsCount, header, xlsWorkbookOut, resDb);
+				// Определяем заголовок прайса, идентифицируем его колонки
+				PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
+
+				// Если конец заголовка найден,
+				if (header.getEndRowInd() != null) {
+					// обрабатываем строки данных
+					dataRowsProcessing(srcSheet, modaCellsCount, header, xlsWorkbookOut, resDb);
+				} else {
+					logger.info("Заголовок на листе '" + srcSheet.getSheetName()+ "'не найден");
+				}
+
+			} else {
+				logger.info("На листе '" + srcSheet.getSheetName()+ "' не определена типичная длина строки");
+			}
+		} else {
+			logger.info("Лист '" + srcSheet.getSheetName()+ "' пуст");
+		}
 	}
 
 	/**
@@ -132,7 +147,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @return Integer Мода количества заполненных ячеек по строкам
 	 */
 	private Integer defineModaCellsCount(Sheet srcSheet) {
-		logger.info("defineModaCellsCount //////////////////////////////////////////////////");
+		logger.info("Определение моды количества заполненных ячеек по строкам");
 
 		// Мэп количества заполненных ячеек в строке с частотой их встречаемости
 		HashMap<Integer, Integer> cellsInRowHashMap = new HashMap<>();
@@ -169,7 +184,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			totalCount += entry.getValue();
 		}
 
-		logger.info("Типичная длина строки " + maxCellsCountKey + " (" + maxCellsCount + " из " + totalCount + ")");
+		logger.info("Типичная длина строки " + maxCellsCountKey + " (" + maxCellsCount + " строк из " + totalCount + ")");
 
 		return maxCellsCountKey;
 	}
@@ -181,7 +196,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @return
 	 */
 	private PriceListHeader priceListStructureDetection(Sheet srcSheet, Integer modaCellsCount) {
-		logger.info("priceListStructureDetection ///////////////////////////////////////////////////////");
+		logger.info("Выявление структуры прайс-листа");
 
 		PriceListHeader header = new PriceListHeader(modaCellsCount);
 
@@ -210,10 +225,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			row = rowIterator.next();
 
 			int cellsInRow = countCellsInRow(row);
-
+if (row.getRowNum() == 2) {
+	logger.info("CCC:"+cellsInRow);
+}
 			if (cellsInRow == modaCellsCount) {
-
-				// Признак непрерывного с начала заполнения ячеек строки
+logger.info(row.getRowNum());
+				// Признак непрерывного (с начала) заполнения ячеек строки
 				// Предполагается, что непервые строки заголовка будут заполняться с дырами
 				// Непрерывное заполнение - признак группирующих подзаголовков
 				boolean rowContiniousFilling = true;
@@ -235,7 +252,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				while (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (cell != null) {
-//						logger.debug(cell.getRowIndex() + ":" + cell.getColumnIndex() + " ");
+						logger.debug(cell.getRowIndex() + ":" + cell.getColumnIndex());
 
 						CellType cellType = cell.getCellTypeEnum();
 						try {
@@ -243,6 +260,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 							switch (cellType) {
 								case STRING:
 									String cellStrVal = cell.getStringCellValue().trim();
+									logger.debug(cellStrVal);
 									strCells.add(cellStrVal);
 									int cellStrValLen = cellStrVal.length();
 									tmpStrLenArr[cell.getColumnIndex()] = cellStrValLen;
@@ -261,7 +279,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 									logger.error("Нет обработчика для ячейки типа " + cellType);
 							}
 						} catch (Exception e) {
-							logger.error("Exception при получении значения ячейки");
+							logger.error("Exception при получении значения ячейки", e);
 						}
 
 						if (preCell != null && preCell.getCellTypeEnum() == CellType.BLANK && cellType != CellType.BLANK) {
@@ -279,11 +297,11 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 				// Выяляем строки заголовка, если еще не найдена последняя строка заголовка
 				if (header.getEndRowInd() == null) {
-
+logger.info("zzz1 "+dblCells.size());
 					if (header.getStartRowInd() == null && dblCells.size() == 0) {
 						header.setStartRowInd(row.getRowNum());
 					}
-
+					logger.info("zzz2 "+header.getStartRowInd());
 					if (header.getStartRowInd() != null && rowContiniousFilling /*(dblCells.size() > 0 || outlineLevel > 0)*/) {
 						// Заголовок всей таблицы закончился
 						header.setEndRowInd(row.getRowNum() - 1);

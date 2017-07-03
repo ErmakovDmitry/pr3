@@ -13,13 +13,13 @@
 	<!-- Source directory with xls-files -->
 	<Src
 		DIR_NAME1 = "/home/hddraid/TMP/5/"
-		DIR_NAME = "C:\Users\Дмитрий\TMP\5\">
+		DIR_NAME = "C:\Users\Дмитрий\TMP\6\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
 		FILE_NAME1 = "/home/hddraid/TMP/5/res.xlsx"
-		FILE_NAME = "C:\Users\Дмитрий\TMP\5\res.xlsx">
+		FILE_NAME = "C:\Users\Дмитрий\TMP\6\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb

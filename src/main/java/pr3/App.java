@@ -337,7 +337,7 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                 .withPattern(iniValuesLog.getLogPattern())
                 .build();
         TriggeringPolicy policy = CompositeTriggeringPolicy.createPolicy(
-                SizeBasedTriggeringPolicy.createPolicy("1 M"),
+                SizeBasedTriggeringPolicy.createPolicy("10 M"),
                 OnStartupTriggeringPolicy.createPolicy(1)
         );
         final DefaultRolloverStrategy strategy = DefaultRolloverStrategy.createStrategy(
