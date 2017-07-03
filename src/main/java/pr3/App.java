@@ -138,18 +138,31 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 
 
         try {
-//            System.out.println(getClass().getPackage().getImplementationVersion());
 
             // Читаем из pom.xml сведения о приложении
             MavenXpp3Reader reader = new MavenXpp3Reader();
-            Model model = reader.read(new FileReader("pom.xml"));
 
-//        /home/dmitry/IdeaProjects/pr3/pr3_ini.xml
+            // Ресурс для чтения pom-файла из скомпилированного jar-ника
+            InputStream resource = App.class.getResourceAsStream("/META-INF/maven/ru.aeinf.pr3/pr3/pom.xml");
+            // Ридер для чтения
+            Reader pomReader = (resource == null)?
+                // pom-ника при запуске из Idea
+                new FileReader("pom.xml")
+            :
+                // pom-ника из скомпилированного jar-ника при запуске из командной строки
+                new InputStreamReader(resource)
+            ;
+            // Модель для доступа к содержимому pom-ника
+            Model model = reader.read(pomReader);
 
+            // Название и версия приложения
             String appNameAndVer = "\n" + model.getArtifactId() + " version \"" + model.getVersion() + "\"";
-            String appUsage = "\nUsage: pr3.jar pr3_ini.xml";
+            // Формат командной строки для запуска приложения
+            String appUsage = "\nUsage: " + model.getArtifactId() +".jar " + model.getArtifactId() + "_ini.xml";
             if (args.length != 1) {
-                throw new RuntimeException(appNameAndVer + appUsage);
+                System.out.println(appNameAndVer + appUsage);
+                exit(0);
+//                throw new RuntimeException(appNameAndVer + appUsage);
             }
 
             // Получаем из командной строки имя xml-файла настроек
