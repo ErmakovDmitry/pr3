@@ -118,6 +118,10 @@ public class XLSWorkbookOut extends XLSWorkbook {
 		}
 	}
 
+	/**
+	 * Вывод в выходной файл строки с данными
+	 * @param resRow
+	 */
 	public void addRow(ResRow resRow) {
 
 		Row row = sheet.createRow(sheet.getLastRowNum()+1);
@@ -126,7 +130,9 @@ public class XLSWorkbookOut extends XLSWorkbook {
 
 //		plna_id bigint(20) UN AI PK
 //		plna_source_type  varchar(100)
+
 //		plna_source_id  int(11)
+		addCell(row, getColIndByDbFldName("plna_source_id"), resRow.getSrcFileName());
 
 //		plna_row_num  int(11)
 		addCell(row, getColIndByDbFldName("plna_row_num"), resRow.getSrcRowNum());

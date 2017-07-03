@@ -109,11 +109,11 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	/**
 	 * Парсинг одного листа рабочей книги
 	 * @param srcSheet
-	 * @param XLSWorkbookOut
+	 * @param xlsWorkbookOut
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseSheet(Sheet srcSheet, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
+	public void parseSheet(Sheet srcSheet, XLSWorkbookOut xlsWorkbookOut, OutDb resDb) {
 		logger.info("Лист " + srcSheet.getSheetName());
 
 		// Определяем размер строк с данными в виде количества заполненных ячеек
@@ -123,7 +123,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
 
 		// Обрабатываем строки данных
-		dataRowsProcessing(srcSheet, modaCellsCount, header, XLSWorkbookOut, resDb);
+		dataRowsProcessing(srcSheet, modaCellsCount, header, xlsWorkbookOut, resDb);
 	}
 
 	/**
@@ -420,6 +420,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 				// Результирующая (выходная) запись
 				ResRow resRow = new ResRow();
+				resRow.setSrcFileName(fileName.getFullNameWithoutDir());
 				resRow.setSrcRowNum(dataCurRowInd + 1);
 //				// Признак непрерывного с начала заполнения ячеек строки
 //				// Предполагается, что непервые строки заголовка будут заполняться с дырами

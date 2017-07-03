@@ -31,13 +31,13 @@ public class FileName {
 		this.fullNameWithDir = fullNameWithDir.trim();
 
 		fullNameWithoutDir = this.fullNameWithDir;
-		int slashPos = this.fullNameWithDir.lastIndexOf("/") + 1;
+		int slashPos = this.fullNameWithDir.lastIndexOf("/");
 		if (slashPos > -1) {
 			fullNameWithoutDir = this.fullNameWithDir.substring(slashPos);
 		} else {
-			slashPos = this.fullNameWithDir.lastIndexOf("\\") + 1;
+			slashPos = this.fullNameWithDir.lastIndexOf("\\");
 			if (slashPos > -1) {
-				fullNameWithoutDir = this.fullNameWithDir.substring(slashPos);
+				fullNameWithoutDir = this.fullNameWithDir.substring(slashPos + 1);
 			}
 		}
 

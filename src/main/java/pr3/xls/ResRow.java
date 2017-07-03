@@ -9,6 +9,11 @@ import java.util.ArrayList;
 public class ResRow implements Cloneable  {
 
     /**
+     * Наименование исходного файла
+     */
+    private String srcFileName;
+
+    /**
      * Номер строки в исходном файле
      */
     private Integer srcRowNum;
@@ -23,6 +28,14 @@ public class ResRow implements Cloneable  {
     private String otherVals;
 
     public ResRow() {
+    }
+
+    public String getSrcFileName() {
+        return srcFileName;
+    }
+
+    public void setSrcFileName(String srcFileName) {
+        this.srcFileName = srcFileName;
     }
 
     public Integer getSrcRowNum() {
@@ -90,6 +103,7 @@ public class ResRow implements Cloneable  {
     @Override
     public String toString() {
         return "ResRow{" +
+                "\n\t srcFileName=" + srcFileName +
                 "\n\t srcRowNum=" + srcRowNum +
                 "\n\t parentsArrList=" + parentsArrList +
                 "\n\t articlesArrList=" + articlesArrList +
