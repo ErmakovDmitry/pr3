@@ -14,12 +14,12 @@ public class PriceListHeader {
     /**
      * Индекс первой строки заголовка
      */
-    private Integer startRowInd;
+    private Integer startRowInd = null;
 
     /**
      * Индекс последней строки заголовка
      */
-    private Integer endRowInd;
+    private Integer endRowInd = null;
 
     /**
      * Массив колонок прайс-листа

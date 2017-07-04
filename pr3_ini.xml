@@ -4,22 +4,22 @@
 <Pr3IniValues>
 	<!-- Log params -->
 	<Log
-		DIR_NAME1 = "/home/dmitry/IdeaProjects/pr3/log/"
-		DIR_NAME = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
+		DIR_NAME = "/home/dmitry/IdeaProjects/pr3/log/"
+		DIR_NAME1 = "C:\Users\Дмитрий\IdeaProjects\pr3\log\"
 		FILE_NAME = "pr3.log"
 		FILE_NAME_PATTERN = "pr3_%d{yyyy-MM-dd}_%i.log"
 		LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %c - %msg%n">
 	</Log>
 	<!-- Source directory with xls-files -->
 	<Src
-		DIR_NAME1 = "/home/hddraid/TMP/5/"
-		DIR_NAME = "C:\Users\Дмитрий\TMP\6\">
+		DIR_NAME = "/home/hddraid/TMP/6/"
+		DIR_NAME1 = "C:\Users\Дмитрий\TMP\6\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
-		FILE_NAME1 = "/home/hddraid/TMP/5/res.xlsx"
-		FILE_NAME = "C:\Users\Дмитрий\TMP\6\res.xlsx">
+		FILE_NAME = "/home/hddraid/TMP/6/res.xlsx"
+		FILE_NAME1 = "C:\Users\Дмитрий\TMP\6\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb

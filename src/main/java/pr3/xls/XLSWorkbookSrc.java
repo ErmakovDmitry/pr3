@@ -7,17 +7,13 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import pr3.bak.RefRow;
 import pr3.db.OutDb;
 import pr3.db.OutDbRow;
 import pr3.ini.IniValues;
 import pr3.utils.FileName;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -117,13 +113,14 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		logger.info("Лист '" + srcSheet.getSheetName() + "'");
 
 		if (srcSheet.getLastRowNum() > 0) {
-			// Определяем размер строк с данными в виде количества заполненных ячеек
+
 			Integer modaCellsCount = defineModaCellsCount(srcSheet);
+			Integer modaLastCellNum = defineModaLastCellNum(srcSheet);
 
 			if (modaCellsCount != null) {
 
 				// Определяем заголовок прайса, идентифицируем его колонки
-				PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount);
+				PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount, modaLastCellNum);
 
 				// Если конец заголовка найден,
 				if (header.getEndRowInd() != null) {
@@ -175,7 +172,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		Integer maxCellsCountKey = null;
 		// Общее количество строк
 		int totalCount = 0;
-		// Потск в мэпе элемента с макоимальным значением
+		// Поиск в мэпе элемента с максимальным значением
 		for (Map.Entry<Integer, Integer> entry : cellsInRowHashMap.entrySet()) {
 			if (entry.getValue() > maxCellsCount) {
 				maxCellsCount = entry.getValue();
@@ -189,13 +186,61 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		return maxCellsCountKey;
 	}
 
+
+	/**
+	 * Определение моды (самого часто встречающегося) номера последней заполненной ячейки в строке
+	 * @param srcSheet xls-лист с данными
+	 * @return Integer Мода количества заполненных ячеек по строкам
+	 */
+	private Integer defineModaLastCellNum(Sheet srcSheet) {
+		logger.info("Определение моды индекса колонки для последней заполненной в строке ячейки");
+
+		// Мэп количества заполненных ячеек в строке с частотой их встречаемости
+		HashMap<Integer, Integer> lastCellNumHashMap = new HashMap<>();
+
+		lastCellNumHashMap.clear();
+
+		Row row;
+		Iterator<Row> rowIterator = srcSheet.iterator();
+		while (rowIterator.hasNext()) {
+			row = rowIterator.next();
+
+			// Количество заполненных ячеек в строке (длина строки)
+			int lastCellNum = row.getLastCellNum();
+
+			// Создание в мэпе нового элемента для подсчета количества строк с еще не встречавшейся длиной
+			lastCellNumHashMap.computeIfAbsent(lastCellNum, (v) -> 0);
+			// Подсчет количества строк с разной длиной
+			lastCellNumHashMap.computeIfPresent(lastCellNum, (k,v) -> v+1);
+		}
+
+		// Количество строк с типичной длиной
+		int maxCellNumCount = 0;
+		// Ключ в мэпе элемента с максимальным значением - искомое значение
+		Integer maxCellNumKey = null;
+		// Общее количество строк
+		int totalCount = 0;
+		// Поиск в мэпе элемента с максимальным значением
+		for (Map.Entry<Integer, Integer> entry : lastCellNumHashMap.entrySet()) {
+			if (entry.getValue() > maxCellNumCount) {
+				maxCellNumCount = entry.getValue();
+				maxCellNumKey = entry.getKey();
+			}
+			totalCount += entry.getValue();
+		}
+
+		logger.info("Типичный номер последней ячейки " + maxCellNumKey + " (" + maxCellNumCount + " строк из " + totalCount + ")");
+
+		return maxCellNumKey;
+	}
+
 	/**
 	 * Выявление структуры прайс-листа
 	 * @param srcSheet
 	 * @param modaCellsCount
 	 * @return
 	 */
-	private PriceListHeader priceListStructureDetection(Sheet srcSheet, Integer modaCellsCount) {
+	private PriceListHeader priceListStructureDetection(Sheet srcSheet, Integer modaCellsCount, Integer modaLastCellNum) {
 		logger.info("Выявление структуры прайс-листа");
 
 		PriceListHeader header = new PriceListHeader(modaCellsCount);
@@ -225,10 +270,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 			row = rowIterator.next();
 
 			int cellsInRow = countCellsInRow(row);
-if (row.getRowNum() == 2) {
-	logger.info("CCC:"+cellsInRow);
-}
-			if (cellsInRow == modaCellsCount) {
+			int lastCellNum = row.getLastCellNum();
+//if (row.getRowNum() == 2) {
+//	logger.info("CCC:"+cellsInRow);
+//}
+//			if (cellsInRow == modaCellsCount || cellsInRow == 12) {
+			if (lastCellNum == modaLastCellNum) {
 logger.info(row.getRowNum());
 				// Признак непрерывного (с начала) заполнения ячеек строки
 				// Предполагается, что непервые строки заголовка будут заполняться с дырами
@@ -294,18 +341,19 @@ logger.info(row.getRowNum());
 
 				// Работа со стеком иерархии строк (outline в терминах Excel)
 				int outlineLevel = row.getOutlineLevel();
-
+logger.info("zzz0 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 				// Выяляем строки заголовка, если еще не найдена последняя строка заголовка
 				if (header.getEndRowInd() == null) {
-logger.info("zzz1 "+dblCells.size());
+logger.info("zzz1 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 					if (header.getStartRowInd() == null && dblCells.size() == 0) {
 						header.setStartRowInd(row.getRowNum());
+logger.info("zzz2 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 					}
-					logger.info("zzz2 "+header.getStartRowInd());
+logger.info("zzz3 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 					if (header.getStartRowInd() != null && rowContiniousFilling /*(dblCells.size() > 0 || outlineLevel > 0)*/) {
 						// Заголовок всей таблицы закончился
-						header.setEndRowInd(row.getRowNum() - 1);
-
+						header.setEndRowInd(row.getRowNum());
+logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 						// Заполняем массив с описанием колонок сведениями про заголовок
 						logger.info("Header consolidation:");
 						for (int r = header.getStartRowInd(); r <= header.getEndRowInd(); r++) {
@@ -322,7 +370,6 @@ logger.info("zzz1 "+dblCells.size());
 										columns[c].setHeaderCellStrVal(columns[c].getHeaderCellStrVal() + " " + headerCellStrVal);
 									}
 								}
-
 							}
 						}
 
@@ -331,8 +378,8 @@ logger.info("zzz1 "+dblCells.size());
 					}
 				}
 				// Признак принадлежности строки заголовку
-				boolean isHeaderLine = (header.getEndRowInd() == null);
-				logger.debug("Заголовок:" + String.valueOf(isHeaderLine));
+				boolean isHeaderLine = (header.getEndRowInd() != null);
+				logger.debug("Строка принадлжит заголовоку:" + isHeaderLine);
 
 				// Дербан ячеек строки
 //				logger.debug("tmpStrLen:");
