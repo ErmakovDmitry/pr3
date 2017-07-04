@@ -110,7 +110,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @throws Exception
 	 */
 	public void parseSheet(Sheet srcSheet, XLSWorkbookOut xlsWorkbookOut, OutDb resDb) {
-		logger.info("Лист '" + srcSheet.getSheetName() + "'");
+		logger.info("Лист '" + srcSheet.getSheetName() + "' начало обработки ...");
 
 		if (srcSheet.getLastRowNum() > 0) {
 
@@ -123,9 +123,9 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				PriceListHeader header = priceListStructureDetection(srcSheet, modaCellsCount, modaLastCellNum);
 
 				// Если конец заголовка найден,
-				if (header.getEndRowInd() != null) {
+				if (header.getEndRowNum() != null) {
 					// обрабатываем строки данных
-					dataRowsProcessing(srcSheet, modaCellsCount, header, xlsWorkbookOut, resDb);
+					dataRowsProcessing(srcSheet, modaCellsCount, modaLastCellNum, header, xlsWorkbookOut, resDb);
 				} else {
 					logger.info("Заголовок на листе '" + srcSheet.getSheetName()+ "'не найден");
 				}
@@ -241,7 +241,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @return
 	 */
 	private PriceListHeader priceListStructureDetection(Sheet srcSheet, Integer modaCellsCount, Integer modaLastCellNum) {
-		logger.info("Выявление структуры прайс-листа");
+		logger.info("Выявление структуры прайс-листа ...");
 
 		PriceListHeader header = new PriceListHeader(modaCellsCount);
 
@@ -262,24 +262,20 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		// Локализация массива со сведениями о колонках заголовка
 		PriceListColumn[] columns = header.getColumns();
 
-		// Текущая строка
-		Row row;
-
 		Iterator<Row> rowIterator = srcSheet.iterator();
 		while (rowIterator.hasNext()) {
-			row = rowIterator.next();
+			// Текущая строка
+			Row row = rowIterator.next();
 
-			int cellsInRow = countCellsInRow(row);
+//			int cellsInRow = countCellsInRow(row);
 			int lastCellNum = row.getLastCellNum();
-//if (row.getRowNum() == 2) {
-//	logger.info("CCC:"+cellsInRow);
-//}
+
 //			if (cellsInRow == modaCellsCount || cellsInRow == 12) {
 			if (lastCellNum == modaLastCellNum) {
-logger.info(row.getRowNum());
+				//logger.debug(row.getRowNum());
 				// Признак непрерывного (с начала) заполнения ячеек строки
 				// Предполагается, что непервые строки заголовка будут заполняться с дырами
-				// Непрерывное заполнение - признак группирующих подзаголовков
+				// Непрерывное заполнение - признак первой строки заголовка или группирующих подзаголовков в строках с данными
 				boolean rowContiniousFilling = true;
 
 				strCells.clear();
@@ -299,7 +295,7 @@ logger.info(row.getRowNum());
 				while (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (cell != null) {
-						logger.debug(cell.getRowIndex() + ":" + cell.getColumnIndex());
+//						logger.debug(cell.getRowIndex() + ":" + cell.getColumnIndex());
 
 						CellType cellType = cell.getCellTypeEnum();
 						try {
@@ -307,7 +303,7 @@ logger.info(row.getRowNum());
 							switch (cellType) {
 								case STRING:
 									String cellStrVal = cell.getStringCellValue().trim();
-									logger.debug(cellStrVal);
+//									logger.debug(cellStrVal);
 									strCells.add(cellStrVal);
 									int cellStrValLen = cellStrVal.length();
 									tmpStrLenArr[cell.getColumnIndex()] = cellStrValLen;
@@ -341,29 +337,29 @@ logger.info(row.getRowNum());
 
 				// Работа со стеком иерархии строк (outline в терминах Excel)
 				int outlineLevel = row.getOutlineLevel();
-logger.info("zzz0 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
+
 				// Выяляем строки заголовка, если еще не найдена последняя строка заголовка
-				if (header.getEndRowInd() == null) {
-logger.info("zzz1 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
-					if (header.getStartRowInd() == null && dblCells.size() == 0) {
-						header.setStartRowInd(row.getRowNum());
-logger.info("zzz2 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
+				if (header.getEndRowNum() == null) {
+					if (header.getStartRowNum() == null && dblCells.size() == 0) {
+						header.setStartRowNum(row.getRowNum());
 					}
-logger.info("zzz3 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
-					if (header.getStartRowInd() != null && rowContiniousFilling /*(dblCells.size() > 0 || outlineLevel > 0)*/) {
+					if (header.getStartRowNum() != null && rowContiniousFilling /*(dblCells.size() > 0 || outlineLevel > 0)*/) {
 						// Заголовок всей таблицы закончился
-						header.setEndRowInd(row.getRowNum());
-logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
+						header.setEndRowNum(row.getRowNum() - 1);
+						// Корректировка последней строки заголовка для однострочных заголовков (она получает меньше первой из-за -1 в предыдущей строке)
+						if (header.getEndRowNum() < header.getStartRowNum()) {
+							header.setEndRowNum(header.getStartRowNum());
+						}
 						// Заполняем массив с описанием колонок сведениями про заголовок
-						logger.info("Header consolidation:");
-						for (int r = header.getStartRowInd(); r <= header.getEndRowInd(); r++) {
+						logger.info("Сборка строк заголовка ...");
+						for (int r = header.getStartRowNum(); r <= header.getEndRowNum(); r++) {
 //							logger.debug("getRow(" + r + "):" + srcSheet.getRow(r));
 							Row headerRow = srcSheet.getRow(r);
 							for (int c = headerRow.getFirstCellNum(); c < headerRow.getLastCellNum(); c++) {
 								Cell headerCell = headerRow.getCell(c);
 								String headerCellStrVal = headerCell.getStringCellValue();
 //								logger.debug("headerCell(" + c + "):" + headerCell.getStringCellValue());
-								if (r == header.getStartRowInd()) {
+								if (r == header.getStartRowNum()) {
 									columns[c].setHeaderCellStrVal(headerCellStrVal);
 								} else {
 									if (headerCellStrVal.length() > 0) {
@@ -377,9 +373,20 @@ logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 						header.defineColumnsSemanticTypes();
 					}
 				}
+
 				// Признак принадлежности строки заголовку
-				boolean isHeaderLine = (header.getEndRowInd() != null);
-				logger.debug("Строка принадлжит заголовоку:" + isHeaderLine);
+				boolean isHeaderLine = (
+					(header.getEndRowNum() == null)
+					||
+					(
+						(header.getEndRowNum() != null)
+						&&
+						(header.getEndRowNum() == header.getStartRowNum())
+						&&
+						(row.getRowNum() <= header.getEndRowNum())
+					)
+				);
+				logger.debug("Строка принадлжит заголовоку: " + isHeaderLine);
 
 				// Дербан ячеек строки
 //				logger.debug("tmpStrLen:");
@@ -402,14 +409,14 @@ logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 				}
 
 				logger.debug(
-						"dataRowInd:"+dataRowInd
-								+ " RowNum:"+(row.getRowNum()+1)
-								+ " outlineLevel:" + outlineLevel
-								+ " continiousFilling:" + rowContiniousFilling
-								+ "\n strCells: " + strCells
-								+ "\n dblCells:"+dblCells
-								+ "\n headerRowStartInd:" + header.getStartRowInd()
-								+ "\n headerRowEndInd:" + header.getEndRowInd()
+				"dataRowInd:"+dataRowInd
+					+ " RowNum:"+(row.getRowNum())
+					+ " outlineLevel:" + outlineLevel
+					+ " continiousFilling:" + rowContiniousFilling
+					+ "\n strCells: " + strCells
+					+ "\n dblCells:"+dblCells
+					+ "\n headerRowStartInd:" + header.getStartRowNum()
+					+ "\n headerRowEndInd:" + header.getEndRowNum()
 				);
 
 //				String outlineLevelName = strCells.toString();
@@ -438,19 +445,19 @@ logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 			}
 		}
 
-		logger.info("Заголовок",header.asString());
+		logger.info("Заголовок", header.asString());
 
 		return header;
 	}
 
-	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
+	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, Integer modaLastCellNum, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
 
 		// Если существует объект для выходной xls-книга, пишем в нее строку-заголовок с именами полей из базы данных
 		if (XLSWorkbookOut != null) {
 			XLSWorkbookOut.addHeaderRow();
 		}
 
-		logger.info("dataRowsProcessing ////////////////////////////////////////////////////////////////");
+		logger.info("Обработка строк с данными ...");
 
 		Stack<String> outlineStack = new Stack<>();
 
@@ -461,14 +468,12 @@ logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 		PriceListColumn[] columns = header.getColumns();
 
 		// Индекс первой строки с данными
-		Integer dataStartRowInd = header.getEndRowInd() + 1;
-
-		// Текущая строка
-		Row row;
+		Integer dataStartRowInd = header.getEndRowNum() + 1;
 
 		Iterator<Row> rowIterator = srcSheet.iterator();
 		while (rowIterator.hasNext()) {
-			row = rowIterator.next();
+			// Текущая строка
+			Row row = rowIterator.next();
 
 			// Индекс текущей строки с данными, т.е. строки типичной длины (modaCellsCount)
 			int dataCurRowInd = row.getRowNum();
@@ -478,9 +483,11 @@ logger.info("zzz4 "+header.getStartRowInd()+ ":"+header.getEndRowInd());
 				continue;
 			}
 
-			int cellsInRow = countCellsInRow(row);
+//			int cellsInRow = countCellsInRow(row);
+			int lastCellNum = row.getLastCellNum();
 
-			if (cellsInRow == modaCellsCount) {
+//			if (cellsInRow == modaCellsCount) {
+			if (lastCellNum == modaLastCellNum) {
 				logger.debug("dataCurRowInd:"+dataCurRowInd + " (in Excel:"+(row.getRowNum()+1+")"));
 
 				// Результирующая (выходная) запись

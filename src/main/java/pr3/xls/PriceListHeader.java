@@ -12,14 +12,14 @@ public class PriceListHeader {
     private int modaCellsCount;
 
     /**
-     * Индекс первой строки заголовка
+     * Индекс первой строки заголовка (0-Based)
      */
-    private Integer startRowInd = null;
+    private Integer startRowNum = null;
 
     /**
-     * Индекс последней строки заголовка
+     * Индекс последней строки заголовка (0-Based)
      */
-    private Integer endRowInd = null;
+    private Integer endRowNum = null;
 
     /**
      * Массив колонок прайс-листа
@@ -34,20 +34,20 @@ public class PriceListHeader {
         }
     }
 
-    public Integer getStartRowInd() {
-        return startRowInd;
+    public Integer getStartRowNum() {
+        return startRowNum;
     }
 
-    public void setStartRowInd(Integer startRowInd) {
-        this.startRowInd = startRowInd;
+    public void setStartRowNum(Integer startRowNum) {
+        this.startRowNum = startRowNum;
     }
 
-    public Integer getEndRowInd() {
-        return endRowInd;
+    public Integer getEndRowNum() {
+        return endRowNum;
     }
 
-    public void setEndRowInd(Integer endRowInd) {
-        this.endRowInd = endRowInd;
+    public void setEndRowNum(Integer endRowNum) {
+        this.endRowNum = endRowNum;
     }
 
     public PriceListColumn[] getColumns() {
@@ -72,8 +72,8 @@ public class PriceListHeader {
 
         res = "Заголовок:" +
                 "\nmodaCellsCount=" + modaCellsCount +
-                "\nstartRowInd=" + startRowInd +
-                "\nendRowInd=" + endRowInd +
+                "\nstartRowNum=" + startRowNum +
+                "\nendRowNum=" + endRowNum +
                 "\n" + res;
 
         return res;
