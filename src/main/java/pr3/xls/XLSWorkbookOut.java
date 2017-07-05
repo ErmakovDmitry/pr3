@@ -192,7 +192,13 @@ public class XLSWorkbookOut extends XLSWorkbook {
 //		plna_discount_proc  decimal(10,2)
 //		plna_brand  varchar(50)
 //		plna_seller varchar(50)
+
 //		plna_article_code varchar(50)
+		if (resRow.getArticlesArrList().size() > 0) {
+			addCell(row, getColIndByDbFldName("plna_article_code"), resRow.getArticlesArrList().get(0));
+		}
+
+
 //		plna_article_type varchar(50)
 //		plna_article_code1  varchar(50)
 

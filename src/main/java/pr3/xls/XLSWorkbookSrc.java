@@ -351,19 +351,21 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 							header.setEndRowNum(header.getStartRowNum());
 						}
 						// Заполняем массив с описанием колонок сведениями про заголовок
-						logger.info("Сборка строк заголовка ...");
+						logger.info("Сборка строк заголовка (строки " + header.getStartRowNum() + ":" + header.getEndRowNum() +")...");
 						for (int r = header.getStartRowNum(); r <= header.getEndRowNum(); r++) {
 //							logger.debug("getRow(" + r + "):" + srcSheet.getRow(r));
 							Row headerRow = srcSheet.getRow(r);
+							logger.debug(" columns.size: " + columns.length + " headerRow.getFirstCellNum():" + headerRow.getFirstCellNum() + " headerRow.getLastCellNum():" + headerRow.getLastCellNum());
 							for (int c = headerRow.getFirstCellNum(); c < headerRow.getLastCellNum(); c++) {
 								Cell headerCell = headerRow.getCell(c);
 								String headerCellStrVal = headerCell.getStringCellValue();
-//								logger.debug("headerCell(" + c + "):" + headerCell.getStringCellValue());
+								int colInd = c - headerRow.getFirstCellNum();
+								logger.debug("headerCell(" + c + "):" + headerCell.getStringCellValue());
 								if (r == header.getStartRowNum()) {
-									columns[c].setHeaderCellStrVal(headerCellStrVal);
+									columns[colInd].setHeaderCellStrVal(headerCellStrVal);
 								} else {
 									if (headerCellStrVal.length() > 0) {
-										columns[c].setHeaderCellStrVal(columns[c].getHeaderCellStrVal() + " " + headerCellStrVal);
+										columns[colInd].setHeaderCellStrVal(columns[colInd].getHeaderCellStrVal() + " " + headerCellStrVal);
 									}
 								}
 							}
@@ -510,7 +512,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				while (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (cell != null) {
-						int cellColInd = cell.getColumnIndex();
+						int cellColInd = cell.getColumnIndex() - row.getFirstCellNum();
 						ColumnSemanticType cellSemanticType = columns[cellColInd].getSemanticType();
 						String cellStrVal = null;
 						if (cellSemanticType != null) {
