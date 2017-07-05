@@ -143,12 +143,12 @@ public class XLSWorkbookOut extends XLSWorkbook {
 //		plna_date_to  date
 
 //		plna_item_text  text
-		if (resRow.getParentsArrList().size() > 0) {
+		if (resRow.getNamesArrList().size() > 0) {
 			addCell(row, getColIndByDbFldName("plna_item_text"), resRow.getNamesArrList().get(0));
 		}
 
 //		plna_item_text_extra  text
-		if (resRow.getParentsArrList().size() > 1) {
+		if (resRow.getNamesArrList().size() > 1) {
 			addCell(row, getColIndByDbFldName("plna_item_text_extra"), resRow.getNamesArrList().get(1));
 		}
 
@@ -170,10 +170,16 @@ public class XLSWorkbookOut extends XLSWorkbook {
 //		plna_item_currency  varchar(10)
 //		plna_currency_rate  decimal(10,4)
 //		plna_vat_rate decimal(10,5)
+
 //		plna_units  varchar(50)
+		if (resRow.getUnitsArrList().size() > 0) {
+			addCell(row, getColIndByDbFldName("plna_units"), resRow.getUnitsArrList().get(0));
+		}
 
 //		plna_price_1  decimal(15,2)
-		addCell(row, getColIndByDbFldName("plna_price_1"), resRow.getPricesArrList().get(0));
+		if (resRow.getPricesArrList().size() > 0) {
+			addCell(row, getColIndByDbFldName("plna_price_1"), resRow.getPricesArrList().get(0));
+		}
 
 //		plna_price_rub_1  decimal(15,2)
 //		plna_price_many decimal(15,2)
@@ -189,12 +195,26 @@ public class XLSWorkbookOut extends XLSWorkbook {
 //		plna_article_code varchar(50)
 //		plna_article_type varchar(50)
 //		plna_article_code1  varchar(50)
+
 //		plna_item_code  varchar(50)
+		if (resRow.getNumbersArrList().size() > 0) {
+			addCell(row, getColIndByDbFldName("plna_item_code"), resRow.getNumbersArrList().get(0));
+		}
+
 //		plna_order_code varchar(50)
 //		plna_minimal_order  varchar(50)
 //		plna_minimal_order_sum  decimal(15,2)
+
 //		plna_part_num varchar(50)
+		if (resRow.getNumbersArrList().size() > 1) {
+			addCell(row, getColIndByDbFldName("plna_part_num"), resRow.getNumbersArrList().get(1));
+		}
+
 //		plna_extra_data text
+		if (resRow.getOtherVals() != null) {
+			addCell(row, getColIndByDbFldName("plna_extra_data text"), resRow.getOtherVals());
+		}
+
 //		plna_sys_row_updated  int(11)
 
 	}

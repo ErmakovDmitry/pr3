@@ -33,7 +33,7 @@ public class FileName {
 		fullNameWithoutDir = this.fullNameWithDir;
 		int slashPos = this.fullNameWithDir.lastIndexOf("/");
 		if (slashPos > -1) {
-			fullNameWithoutDir = this.fullNameWithDir.substring(slashPos);
+			fullNameWithoutDir = this.fullNameWithDir.substring(slashPos + 1);
 		} else {
 			slashPos = this.fullNameWithDir.lastIndexOf("\\");
 			if (slashPos > -1) {
