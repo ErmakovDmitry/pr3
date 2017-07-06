@@ -33,6 +33,7 @@ import org.apache.logging.log4j.core.util.Integers;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import pr3.ini.*;
 import pr3.utils.FileName;
@@ -175,8 +176,12 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             XmlIniFile xmlIniFile = new XmlIniFile();
             iniValues = xmlIniFile.load(iniFileName.getFullNameWithDir(), IniValues.class);
 
+            // Очистка каталога с логами
+            FileUtils.cleanDirectory(iniValues.getIniValuesLog().getDirName());
+
             // Инициализация логгирования
             configLog(iniValues.getIniValuesLog());
+
 
             // Эти вызовы идут после инициализации логгирования, иначе не попадают в лог
             logger.info("////////////////////////");
