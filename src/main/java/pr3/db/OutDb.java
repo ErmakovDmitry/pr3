@@ -120,27 +120,6 @@ public class OutDb {
      */
     public Integer insPriceListAndGetId(String source_type, String source_name) throws SQLException {
         Integer autoId = null;
-        /*
-        SELECT * FROM DB_GP.plna_sources;
-
-INSERT INTO DB_GP.plna_sources
-SET
-	plnas_source_type = "gpermakov_test"
-	,plnas_source_name = "file_test";
-
-
-SELECT * FROM DB_GP.plna_sources
-WHERE plnas_source_type = "gpermakov_test";
-
-DELETE FROM DB_GP.plna_sources
-WHERE plnas_source_type = "gpermakov_test";
-
-SELECT * FROM DB_GP.plna_sources
-WHERE plnas_id = 86;
-
-DELETE FROM DB_GP.plna_sources
-WHERE plnas_id = 87;
-         */
 
         PreparedStatement stmt = null;
         ResultSet rs = null;

@@ -3,6 +3,8 @@ package pr3.xls;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+
 /**
  * Заголовок прайс-листа
  * Created by dmitry on 05.05.17.
@@ -73,29 +75,11 @@ public class PriceListHeader {
         }
     }
 
-    public String asString() {
-        String res = "";
-
-        for (int i = 0; i < columns.length; i++) {
-            res = res + "; column[" + i + "] " + columns[i] +"\n";
-        }
-
-        res = "Заголовок:" +
-                "\nmodaCellsCount=" + modaCellsCount +
-                "\nstartRowNum=" + startRowNum +
-                "\nendRowNum=" + endRowNum +
-                "\n" + res;
-
-        return res;
-    }
-
-    @Override
-    public String toString() {
-        return "Заголовок {" +
-                "modaCellsCount=" + modaCellsCount +
-                '}';
-    }
-
+    /**
+     * Определение семантического типа по индексу
+     * @param ind
+     * @return
+     */
     public ColumnSemanticType defineSemanticTypeByInd(int ind) {
         ColumnSemanticType res = null;
 
@@ -110,4 +94,31 @@ public class PriceListHeader {
 
         return res;
     }
+
+    public String asString() {
+        String res = "";
+
+        for (int i = 0; i < columns.length; i++) {
+            res = res + "column[" + i + "] " + columns[i] +";\n";
+        }
+
+        res = "Заголовок:" +
+                "\nmodaCellsCount=" + modaCellsCount +
+                "\nstartRowNum=" + startRowNum +
+                "\nendRowNum=" + endRowNum +
+                "\n" + res;
+
+        return res;
+    }
+
+    @Override
+    public String toString() {
+        return "PriceListHeader{" +
+                "modaCellsCount=" + modaCellsCount +
+                ", startRowNum=" + startRowNum +
+                ", endRowNum=" + endRowNum +
+                ", columns=" + Arrays.toString(columns) +
+                '}';
+    }
+
 }

@@ -136,7 +136,8 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 //                .getName();
 //        logger.debug(jarName);
 
-
+        // Счетчик обработанных файлов
+        final int[] filesCont = {0};
 
         try {
 
@@ -182,11 +183,10 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             // Инициализация логгирования
             configLog(iniValues.getIniValuesLog());
 
-
             // Эти вызовы идут после инициализации логгирования, иначе не попадают в лог
             logger.info("////////////////////////");
             logger.info("pr3.jar is running with ini-file (" + iniFileName.getFullNameWithDir() + ") ...");
-            logger.info(iniValues.asString());
+            logger.debug(iniValues.asString());
 
             // Инициализация элементов enum ключевыми словами для распознавания смысловых типов колонок
             ColumnSemanticType.init(iniValues.getIniValuesParser().getIniValuesColumnSemanticTypes());
@@ -200,9 +200,9 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             if (Files.exists(xlsOutFilePath)) {
                 if (Files.isRegularFile(xlsOutFilePath)) {
                     Files.deleteIfExists(xlsOutFilePath);
-                    logger.info("Выходной xls-файл:" + xlsOutFileName.getFullNameWithDir() + " удален");
+                    logger.info("Выходной xls-файл удален");
                 } else {
-                    logger.error("Имя выходного xls-файла занято, видимо, каталогом");
+                    logger.info("Имя выходного xls-файла занято, видимо, каталогом");
                     exit(1);
                 }
             }
@@ -234,98 +234,37 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                                 return true;
                             }
                         } catch (Exception e) {
-                            logger.log(Level.ERROR, "Перебор файлов", e);
+                            logger.info("Ошибка при переборе файлов", e);
                         }
                     }
                     return false;
                 }
             ).forEach(path -> {
-                logger.info("Обработка файла: " + path);
+                logger.info("\nОбработка файла '" + path +"'");
+                logger.info("---------------------------------------");
                 try {
                     FileName srcFileName = new FileName(path.toString());
                     XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                     xlsParser.parseFile();
                 } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
-                    logger.log(Level.ERROR, "Файл НЕ обработан, т.к. произошло исключение!", e);
+                    logger.info("Файл НЕ обработан, т.к. произошло исключение!", e);
                 }
 
                 logger.info("---------------------------------------");
-                logger.info("Обработка файла: " + path + " закончена");
+                logger.info("Закончена обработка файла '" + path + "'");
+                filesCont[0]++;
             });
         } catch (XmlIniFileException e) {
-            logger.error("Ошибка при обработке XmlIni-файла", e);
+            logger.info("Ошибка при обработке XmlIni-файла", e);
         } catch (FileNameException e) {
-            logger.error("Ошибка при обработке имени файла", e);
+            logger.info("Ошибка при обработке имени файла", e);
         } catch (IOException e) {
-            logger.error("Ошибка ввода/вывода", e);
+            logger.info("Ошибка ввода/вывода", e);
         } catch (XmlPullParserException e) {
-            logger.error("Ошибка xml-парсера при чтении pom.xml", e);
+            logger.info("Ошибка xml-парсера при чтении pom.xml", e);
         }
 
-/*
-        FileName resFileName = new FileName(srcDirName + resFN);
-
-        File fileOut = new File(resFileName.getFullNameWithDir());
-        fileOut.delete();
-
-        final Stats stat = new Stats();
-        HashMap<String, Integer> stat2 = new HashMap<String, Integer>();
-        stat2.clear();
-
-        File srcDir = new File(srcDirName);
-        File[] srcFiles = srcDir.listFiles();
-
-        for (File srcFile : srcFiles) {
-            FileName srcFileName = new FileName(srcDirName + srcFile.getNamesArrList());
-
-            if (!srcFile.isDirectory() &&
-                    !srcFileName.getFullNameWithoutDir().equalsIgnoreCase(resFileName.getFullNameWithoutDir()) &&
-                    (srcFileName.getExtension().equalsIgnoreCase("xls") || srcFileName.getExtension().equalsIgnoreCase("xlsx"))
-                    ) {
-
-                addToLog("Файл:" + srcFileName.getFullNameWithoutDir());
-
-                stat.fileCount++;
-
-                XLSParser xlsParser = new XLSParser(resFileName, srcFileName);
-                // Прослушка событий для сбора статистики
-                PropertyChangeSupport pcs = xlsParser.getSrcWb().getPropertyChangeSupport();
-                pcs.addPropertyChangeListener("rowSkip", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        stat.rowSkip++;
-                        addToLog("- пропуск {" + evt.getNewValue() + "}");
-                    }
-                });
-                pcs.addPropertyChangeListener("rowAdd", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        stat.rowAdd++;
-                        addToLog("+ запись  " + evt.getNewValue());
-                    }
-                });
-                xlsParser.parseFile();
-
-                stat2.put(srcFile.getNamesArrList(), stat.rowAdd);
-            }
-//if (i==0) {
-//	break;
-//}
-        }
-
-        addToLog(stat.toString());
-
-        addToLog("Стат. по компаниям: ");
-        int j = 0;
-        for (Map.Entry entry : stat2.entrySet()) {
-            j++;
-            addToLog(j + "; " + entry.getKey() + "; " + entry.getValue());
-        }
-        addToLog("Финиш.");
-//	    } catch (Exception e) {
-//		    addToLog("Ошибка: " + e);
-//	    }
-*/
+        logger.info("\nОбработано файлов: " + filesCont[0]);
     }
 
     /**
@@ -386,8 +325,11 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
         config.addAppender(fileAppender);
         config.addAppender(consoleAppender);
 
-        AppenderRef ref = AppenderRef.createAppenderRef("File", Level.ALL, null);
-        AppenderRef refConsole = AppenderRef.createAppenderRef("console", Level.ALL, null);
+        // Преобразуем строковое представление уровня логгирования из xml-файла в enum
+        Level lvl = Level.getLevel(iniValuesLog.getLevel());
+
+        AppenderRef ref = AppenderRef.createAppenderRef("File", lvl, null);
+        AppenderRef refConsole = AppenderRef.createAppenderRef("console", lvl, null);
         AppenderRef[] refs = new AppenderRef[] { ref, refConsole };
 
         LoggerConfig loggerConfig = LoggerConfig.createLogger(
@@ -401,8 +343,8 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                 , null
 
         );
-        loggerConfig.addAppender(fileAppender, Level.ALL, null);
-        loggerConfig.addAppender(consoleAppender, Level.ALL, null);
+        loggerConfig.addAppender(fileAppender, lvl, null);
+        loggerConfig.addAppender(consoleAppender, lvl, null);
 
         config.addLogger(LogManager.ROOT_LOGGER_NAME, loggerConfig);
         ctx.updateLoggers();

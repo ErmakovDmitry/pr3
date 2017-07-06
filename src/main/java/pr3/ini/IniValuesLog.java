@@ -28,6 +28,11 @@ public class IniValuesLog {
      */
     private String logPattern;
 
+    /**
+     * Строковое представление уровня логгирования
+     */
+    private String level;
+
     public String getDirName() {
         return dirName;
     }
@@ -64,12 +69,22 @@ public class IniValuesLog {
         this.logPattern = logPattern;
     }
 
+    public String getLevel() {
+        return level;
+    }
+
+    @XmlAttribute(name="LEVEL", required = true)
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
     public String asString() {
         return "IniValuesLog {" +
                 "\n\t\tdirName='" + dirName + '\'' +
                 "\n\t\tfileName='" + fileName + '\'' +
                 "\n\t\tfileNamePattern='" + fileNamePattern + '\'' +
                 "\n\t\tlogPattern='" + logPattern + '\'' +
+                "\n\t\tlevel='" + level + '\'' +
                 "\n\t}";
     }
 

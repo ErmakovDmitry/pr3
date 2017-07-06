@@ -33,11 +33,6 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	final static Logger logger = LogManager.getLogger(XLSWorkbookSrc.class.getName());
 
 	/**
-	 * Строковый идентификатор источника прайсов
-	 */
-	final static String srcType = "gpermakov_test";
-
-	/**
 	 * Количество строк исходного файла, обрабатываемого парсером, или null, чтобы парсить всё
 	 */
 	final static Integer MAX_ROWS_TO_PARSE = null;
@@ -336,10 +331,10 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 								case ERROR:
 									break;
 								default:
-									logger.error("Нет обработчика для ячейки типа " + cellType);
+									logger.debug("Нет обработчика для ячейки типа " + cellType);
 							}
 						} catch (Exception e) {
-							logger.error("Exception при получении значения ячейки", e);
+							logger.debug("Exception при получении значения ячейки", e);
 						}
 
 						if (preCell != null && preCell.getCellTypeEnum() == CellType.BLANK && cellType != CellType.BLANK) {
@@ -458,14 +453,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 //				}
 //				logger.debug("outlineStack:" + outlineStack);
 
-				logger.info("--------------");
-
 				dataRowInd++;
 				//if (dataRowInd > 20) break;
 			}
 		}
 
-		logger.info("Заголовок", header.asString());
+		logger.info(header.asString());
 
 		return header;
 	}
@@ -479,7 +472,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 
 		// Если существует объект для выходной базы, пишем в нее сведения о прайс-листе и получаем id добавленной записи
 		if (resDb != null) {
-			priceListRecId = resDb.insPriceListAndGetId(srcType, fileName.getFullNameWithDir());
+			priceListRecId = resDb.insPriceListAndGetId(iniValues.getIniValuesOutDb().getSrcType(), fileName.getFullNameWithDir());
 			logger.info("Идентификатор прайс-листа в базе: "  + priceListRecId);
 		}
 
@@ -491,10 +484,13 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		int preOutlineLevel = -1;
 
 		// Локализация массива со сведениями о колонках заголовка
-		PriceListColumn[] columns = header.getColumns();
+//		PriceListColumn[] columns = header.getColumns();
 
 		// Индекс первой строки с данными
 		Integer dataStartRowInd = header.getEndRowNum() + 1;
+
+		// Счетчик обраюотанных строк
+		int rowCount = 0;
 
 		Iterator<Row> rowIterator = srcSheet.iterator();
 		while (rowIterator.hasNext()) {
@@ -598,7 +594,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 								}
 
 							} catch (Exception e) {
-								logger.error("Exception при получении значения ячейки");
+								logger.debug("Exception при получении значения ячейки");
 							}
 
 						}
@@ -678,19 +674,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 					}
 				}
 
+				rowCount++;
 				if (MAX_ROWS_TO_PARSE != null && dataCurRowInd > MAX_ROWS_TO_PARSE) break;
 			}
 		}
 
-//		logger.debug("header2: ");
-//		for (int z = 0; z < columns.length; z++) {
-//			logger.debug("; header[" + z + "] " + columns[z]);
-//		}
-
-//		for (int maxStrLen : maxStrLenArr) {
-//			logger.debug(" ;" + maxStrLen);
-//		}
-
+		logger.info("Обработано строк: " + rowCount);
 	}
 
 

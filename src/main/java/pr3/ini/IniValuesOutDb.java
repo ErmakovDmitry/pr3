@@ -33,6 +33,11 @@ public class IniValuesOutDb {
      */
     private String pass;
 
+    /**
+     * Идентификатор источника загрузки
+     */
+    private String srcType;
+
     public Boolean getEnabled() {
         return enabled;
     }
@@ -78,6 +83,15 @@ public class IniValuesOutDb {
         this.pass = pass;
     }
 
+    public String getSrcType() {
+        return srcType;
+    }
+
+    @XmlAttribute(name="SRC_TYPE", required = false)
+    public void setSrcType(String srcType) {
+        this.srcType = srcType;
+    }
+
     public String asString() {
         return "IniValuesOutDb {" +
                 "\n\t\tenabled=" + enabled +
@@ -85,6 +99,7 @@ public class IniValuesOutDb {
                 "\n\t\turl='" + url + '\'' +
                 "\n\t\tuser='" + user + '\'' +
                 "\n\t\tpass='" + pass + '\'' +
+                "\n\t\tsrcType='" + srcType + '\'' +
                 "\n\t}";
     }
 
