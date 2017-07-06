@@ -1,10 +1,18 @@
 package pr3.xls;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Заголовок прайс-листа
  * Created by dmitry on 05.05.17.
  */
 public class PriceListHeader {
+
+    /**
+     * Логгер класса
+     */
+    final static Logger logger = LogManager.getLogger(PriceListHeader.class.getName());
 
     /**
      * Количество колонок в прайс-листе
@@ -58,8 +66,10 @@ public class PriceListHeader {
      * Определение семантических типов колонок
      */
     public void defineColumnsSemanticTypes() {
+        logger.info("Определение семантических типов колонок ...");
         for (int i = 0; i < columns.length; i++) {
             columns[i].defineColumnSemanticType();
+            logger.info(i + " => " + columns[i].toString());
         }
     }
 
@@ -84,5 +94,20 @@ public class PriceListHeader {
         return "Заголовок {" +
                 "modaCellsCount=" + modaCellsCount +
                 '}';
+    }
+
+    public ColumnSemanticType defineSemanticTypeByInd(int ind) {
+        ColumnSemanticType res = null;
+
+        if (ind > -1) {
+            for (int i = 0; i < columns.length; i++) {
+                if (columns[i].getInd() == ind) {
+                    res = columns[i].getSemanticType();
+                    break;
+                }
+            }
+        }
+
+        return res;
     }
 }

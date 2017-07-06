@@ -368,6 +368,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 										columns[colInd].setHeaderCellStrVal(columns[colInd].getHeaderCellStrVal() + " " + headerCellStrVal);
 									}
 								}
+								columns[colInd].setInd(headerCell.getAddress().getColumn());
 							}
 						}
 
@@ -512,12 +513,38 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 				while (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (cell != null) {
-						int cellColInd = cell.getColumnIndex() - row.getFirstCellNum();
-						ColumnSemanticType cellSemanticType = columns[cellColInd].getSemanticType();
+
+						String rawCellStrVal = null;
+						Double rawCellDblVal = null;
+						CellType cellType = cell.getCellTypeEnum();
+						switch (cellType) {
+							case STRING:
+								rawCellStrVal = cell.getStringCellValue().trim();
+								break;
+							case NUMERIC:
+								rawCellDblVal = cell.getNumericCellValue();
+								break;
+							case FORMULA:
+								break;
+							case BLANK:
+							case BOOLEAN:
+							case ERROR:
+								break;
+							default:
+								logger.debug("Нет обработчика для ячейки типа " + cellType);
+						}
+
 						String cellStrVal = null;
+						int cellColInd = cell.getColumnIndex() - row.getFirstCellNum();
+//						ColumnSemanticType cellSemanticType = columns[cellColInd].getSemanticType();
+						ColumnSemanticType cellSemanticType = header.defineSemanticTypeByInd(cell.getAddress().getColumn());
 						if (cellSemanticType != null) {
-//							CellType cellType = cell.getCellTypeEnum();
-							logger.debug(cell.getRowIndex() + ":" + cellColInd + " semanticType:" + cellSemanticType);
+							logger.debug(
+									cell.getRowIndex() + ":" + cellColInd
+									+ " semanticType:" + cellSemanticType
+									+ " rawCellStrVal:" + rawCellStrVal
+									+ " rawCellDblVal:" + rawCellDblVal
+							);
 
 							try {
 								switch (cellSemanticType) {
@@ -546,22 +573,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 										resRow.getDescrArrList().add(cellStrVal);
 										break;
 								}
-//							switch (cellType) {
-//								case STRING:
-//									String cellStrVal = cell.getStringCellValue().trim();
-//									break;
-//								case NUMERIC:
-//									double cellDblVal = cell.getNumericCellValue();
-//									break;
-//								case FORMULA:
-//									break;
-//								case BLANK:
-//								case BOOLEAN:
-//								case ERROR:
-//									break;
-//								default:
-//									logger.debug("Нет обработчика для ячейки типа " + cellType);
-//							}
+
 							} catch (Exception e) {
 								logger.error("Exception при получении значения ячейки");
 							}
@@ -641,7 +653,6 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 						// Сохраняем запись
 						resDb.ins(outDbRow);
 					}
-					logger.info("--------------");
 				}
 
 				if (MAX_ROWS_TO_PARSE != null && dataCurRowInd > MAX_ROWS_TO_PARSE) break;

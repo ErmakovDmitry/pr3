@@ -81,7 +81,6 @@ public class PriceListColumn {
     }
 
     public void defineColumnSemanticType() {
-        logger.info("Определение семантических типов колонок ...");
         if (semanticType == null) {
             // Перебор семантических типов
             for (ColumnSemanticType curSemanticType : ColumnSemanticType.values()) {
@@ -94,14 +93,10 @@ public class PriceListColumn {
                     while (keyWordsIterator.hasNext()) {
                         String word = keyWordsIterator.next().toUpperCase();
                         String cellVal = headerCellStrVal.toUpperCase();
-                        logger.debug(cellVal + ":" + word);
                         if (cellVal.contains(word)) {
-                            logger.debug("+ " + curSemanticType);
                             // Тип определен
                             semanticType = curSemanticType;
                             break;
-                        } else {
-                            logger.debug("-");
                         }
                     }
                     // Если тип определен - к следующему типу не переходим
