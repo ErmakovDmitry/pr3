@@ -16,6 +16,7 @@ import pr3.utils.FileName;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -32,6 +33,11 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	final static Logger logger = LogManager.getLogger(XLSWorkbookSrc.class.getName());
 
 	/**
+	 * Строковый идентификатор источника прайсов
+	 */
+	final static String srcType = "gpermakov_test";
+
+	/**
 	 * Количество строк исходного файла, обрабатываемого парсером, или null, чтобы парсить всё
 	 */
 	final static Integer MAX_ROWS_TO_PARSE = null;
@@ -41,10 +47,21 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 */
 	private IniValues iniValues;
 
+	/**
+	 * Локализация названия файла
+	 */
+	private FileName fileName;
+
+	/**
+	 * Id записи о прайс-листе в базе
+	 */
+	private Integer priceListRecId;
+
 	public XLSWorkbookSrc(FileName fileName, IniValues iniValues) throws XLSWorkbookException {
 		super(fileName);
 
 		this.iniValues = iniValues;
+		this.fileName = fileName;
 
 //		definePriceListParamsFromFileName(fileName.getNameWithoutExtension());
 
@@ -93,7 +110,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseWorkbook(XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws XLSWorkbookException {
+	public void parseWorkbook(XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws XLSWorkbookException, SQLException {
 
 		// Перебор листов xls-книги
 		for (int i = 0; i <  workbook.getNumberOfSheets(); i++) {
@@ -109,7 +126,7 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 	 * @param resDb
 	 * @throws Exception
 	 */
-	public void parseSheet(Sheet srcSheet, XLSWorkbookOut xlsWorkbookOut, OutDb resDb) {
+	public void parseSheet(Sheet srcSheet, XLSWorkbookOut xlsWorkbookOut, OutDb resDb) throws SQLException {
 		logger.info("Лист '" + srcSheet.getSheetName() + "' начало обработки ...");
 
 		if (srcSheet.getLastRowNum() > 0) {
@@ -453,11 +470,17 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		return header;
 	}
 
-	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, Integer modaLastCellNum, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) {
+	public void dataRowsProcessing(Sheet srcSheet, Integer modaCellsCount, Integer modaLastCellNum, PriceListHeader header, XLSWorkbookOut XLSWorkbookOut, OutDb resDb) throws SQLException {
 
 		// Если существует объект для выходной xls-книга, пишем в нее строку-заголовок с именами полей из базы данных
 		if (XLSWorkbookOut != null) {
 			XLSWorkbookOut.addHeaderRow();
+		}
+
+		// Если существует объект для выходной базы, пишем в нее сведения о прайс-листе и получаем id добавленной записи
+		if (resDb != null) {
+			priceListRecId = resDb.insPriceListAndGetId(srcType, fileName.getFullNameWithDir());
+			logger.info("Идентификатор прайс-листа в базе: "  + priceListRecId);
 		}
 
 		logger.info("Обработка строк с данными ...");
@@ -646,12 +669,12 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 					}
 
 					// Если существует объект для выходной базы, пишем в нее очередную строку
-					if (resDb != null) {
+					if (resDb != null && priceListRecId != null) {
 						// Готовим запись для базы
 						OutDbRow outDbRow = new OutDbRow();
-						outDbRow.setPlna_item_text(resRow.getNamesArrList().get(0));
+//						outDbRow.setPlna_item_text(resRow.getNamesArrList().get(0));
 						// Сохраняем запись
-						resDb.ins(outDbRow);
+						resDb.insPriceListItem(priceListRecId, resRow, outDbRow);
 					}
 				}
 

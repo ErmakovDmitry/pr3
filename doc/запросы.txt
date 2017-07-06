@@ -1,0 +1,29 @@
+SELECT * FROM DB_GP.plna_sources;
+
+INSERT INTO DB_GP.plna_sources
+SET
+	plnas_source_type = "gpermakov_test"
+	,plnas_source_name = "file_test";
+
+INSERT INTO DB_GP.plna_sources (plnas_source_type, plnas_source_name) VALUES ("gpermakov_test", "file_test");
+
+SELECT * FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test";
+
+DELETE FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test";
+
+SELECT * FROM DB_GP.plna_sources
+WHERE plnas_id = 86;
+
+DELETE FROM DB_GP.plna_sources
+WHERE plnas_id = 87;
+
+SELECT * FROM DB_GP.plna_items
+WHERE plna_source_id = 111;
+
+SELECT count(*) FROM DB_GP.plna_items
+WHERE plna_source_id = (
+SELECT MAX(plnas_id) FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test"
+);

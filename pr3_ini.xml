@@ -23,10 +23,8 @@
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb
-		ENABLED = "false"
-		DRIVER1 = "sun.jdbc.odbc.JdbcOdbcDriver"
+		ENABLED = "true"
 		DRIVER = "com.mysql.jdbc.Driver"
-		URL1 = "jdbc:odbc:195.42.119.80:4912"
 		URL = "jdbc:mysql://195.42.119.80:4912/DB_GP"
 		USER = "gpermakov"
 		PASS = "Eranti&#038;367">

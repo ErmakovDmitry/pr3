@@ -1,11 +1,15 @@
 package pr3.db;
 
+import com.mysql.jdbc.*;
+import com.mysql.jdbc.Driver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pr3.ini.IniValuesOutDb;
+import pr3.xls.ResRow;
 
 import java.sql.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 
@@ -32,17 +36,17 @@ public class OutDb {
     public Connection connect() throws ClassNotFoundException, SQLException {
         logger.info("Подключение к выходной базе с параметрами:\n" +iniValuesOutDb.asString());
         if (connection == null) {
-
-//            try {
-                Class.forName(iniValuesOutDb.getDriver());
-                connection = DriverManager.getConnection(
-                        iniValuesOutDb.getUrl()
-                        , iniValuesOutDb.getUser()
-                        , iniValuesOutDb.getPass()
-                );
-//            } catch (ClassNotFoundException | SQLException e) {
-//                e.printStackTrace();
-//            }
+//            Driver d = new Driver();
+//            java.util.Properties info = new java.util.Properties();
+//            info.put("user", iniValuesOutDb.getUser());
+//            info.put("password", iniValuesOutDb.getPass());
+//            connection  = d.connect(iniValuesOutDb.getUrl(), info);
+            Class.forName(iniValuesOutDb.getDriver());
+            connection = DriverManager.getConnection(
+                    iniValuesOutDb.getUrl()
+                    , iniValuesOutDb.getUser()
+                    , iniValuesOutDb.getPass()
+            );
         }
 
         return connection;
@@ -107,15 +111,192 @@ public class OutDb {
         }
     }
 
-    public void ins(OutDbRow outDbRow) {
-        String query = "INSERT INTO test.books (id, name, author) \n" +
-                " VALUES (3, '" + outDbRow.getPlna_item_text() + "', 'Kathy Sieara');";
+    /**
+     * Добавление в базу записи об импортируемом прайс-листе
+     * @param source_type Идентификатор источника прайс-листа
+     * @param source_name Наименование импортируемого файла
+     * @return
+     * @throws SQLException
+     */
+    public Integer insPriceListAndGetId(String source_type, String source_name) throws SQLException {
+        Integer autoId = null;
+        /*
+        SELECT * FROM DB_GP.plna_sources;
 
-        logger. debug(query);
-        // executing SELECT query
-//        stmt.executeUpdate(query);
+INSERT INTO DB_GP.plna_sources
+SET
+	plnas_source_type = "gpermakov_test"
+	,plnas_source_name = "file_test";
+
+
+SELECT * FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test";
+
+DELETE FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test";
+
+SELECT * FROM DB_GP.plna_sources
+WHERE plnas_id = 86;
+
+DELETE FROM DB_GP.plna_sources
+WHERE plnas_id = 87;
+         */
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            String sql = "INSERT INTO DB_GP.plna_sources (plnas_source_type, plnas_source_name) VALUES (?, ?)";
+
+            stmt = connection. prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            stmt.setString(1, source_type);
+            stmt.setString(2, source_name);
+
+            stmt.executeUpdate();
+
+            rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                autoId = rs.getInt(1);
+            }
+
+        } catch (SQLException ex){
+            throw new SQLException(ex);
+        } finally {
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                rs = null;
+            }
+
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                stmt = null;
+            }
+        }
+
+        return autoId;
     }
 
+    public void insPriceListItem(Integer priceListRecId, ResRow resRow, OutDbRow outDbRow) throws SQLException {
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            String sql =
+                "INSERT INTO DB_GP.plna_items (" +
+                "plna_source_id" +
+                ",plna_row_num" +
+                ",plna_item_text" +
+                ",plna_item_text_extra" +
+                ",plna_item_cat0" +
+                ",plna_item_cat1" +
+                ",plna_item_cat2" +
+                ",plna_item_cat3" +
+                ",plna_item_cat4" +
+                ",plna_units" +
+                ",plna_price_1" +
+                ",plna_article_code" +
+                ",plna_item_code" +
+                ",plna_part_num" +
+                ",plna_extra_data" +
+                ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            stmt = connection. prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            // plna_source_id  int(11)
+            stmt.setInt(1, priceListRecId);
+            // plna_row_num  int(11)
+            stmt.setInt(2, resRow.getSrcRowNum());
+            // plna_item_text  text
+            stmt.setString(3, (resRow.getNamesArrList().size() > 0)? resRow.getNamesArrList().get(0) : null);
+            //	plna_item_text_extra  text
+            stmt.setString(4, (resRow.getNamesArrList().size() > 1)? resRow.getNamesArrList().get(1) : null);
+
+            // plna_item_cat0  text
+            // plna_item_cat1  text
+            // plna_item_cat2  text
+            // plna_item_cat3  text
+            // plna_item_cat4  text
+            for (int i = 5; i <= 9; i++) {
+                stmt.setString(i, (resRow.getParentsArrList().size() > i)? resRow.getParentsArrList().get(i) : null);
+            }
+
+            // plna_units  varchar(50)
+            stmt.setString(10, (resRow.getUnitsArrList().size() > 0)? limitStrLen(resRow.getUnitsArrList().get(0), 50) : null);
+
+            // plna_price_1  decimal(15,2)
+            if (resRow.getPricesArrList().size() > 0) {
+                stmt.setDouble(11, resRow.getPricesArrList().get(0));
+            } else {
+                stmt.setObject(11, null);
+            }
+
+            // plna_article_code varchar(50)
+            stmt.setString(12, (resRow.getArticlesArrList().size() > 0)? limitStrLen(resRow.getArticlesArrList().get(0), 50) : null);
+
+            // plna_item_code  varchar(50)
+            stmt.setString(13, (resRow.getNumbersArrList().size() > 0)? limitStrLen(resRow.getNumbersArrList().get(0), 50) : null);
+
+            // plna_part_num varchar(50)
+            stmt.setString(14, (resRow.getNumbersArrList().size() > 1)? limitStrLen(resRow.getNumbersArrList().get(1), 50) : null);
+
+            // plna_extra_data text
+            stmt.setString(15, (resRow.getOtherVals() != null)? resRow.getOtherVals() : null);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex){
+            throw new SQLException(ex);
+        } finally {
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                rs = null;
+            }
+
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                stmt = null;
+            }
+        }
+    }
+
+
+    /**
+     * Ограничение длины строки для сохранения в поле базы
+     * @param inStr
+     * @param maxLen
+     * @return
+     */
+    private String limitStrLen(String inStr, int maxLen) {
+        String outStr = null;
+
+        if (inStr != null) {
+            outStr = inStr.trim();
+
+            if (outStr.length() > 0) {
+                outStr = outStr.substring(0, Math.min(outStr.length(), maxLen) - 1);
+            }
+        }
+
+        return outStr;
+    }
 
 }
 
