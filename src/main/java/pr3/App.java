@@ -210,6 +210,9 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             // Каталог с исходными файлами
             String srcDirName = iniValues.getIniValuesSrc().getDirName();
 
+            // Id записи о прайс-листе в базе
+            final Integer[] priceListRecId = {null};
+
             // Рекурсивный перебор фйайлов в каталоге-источнике
             logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
             Files.find(
@@ -246,6 +249,7 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                     FileName srcFileName = new FileName(path.toString());
                     XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                     xlsParser.parseFile();
+                    priceListRecId[0] = xlsParser.getPriceListRecId();
                 } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
                     logger.info("Файл НЕ обработан, т.к. произошло исключение!", e);
                 }
@@ -254,6 +258,16 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                 logger.info("Закончена обработка файла '" + path + "'");
                 filesCont[0]++;
             });
+
+            logger.info("\nОбработано файлов: " + filesCont[0]);
+            logger.info("\nРезультат сохранен в файл: " + xlsOutFileName);
+            logger.info("\nЗапрос для получения данных из базы:");
+            logger.info(
+                "SELECT MIN(plna_source_id), count(*)\n" +
+                "FROM DB_GP.plna_items\n" +
+                "WHERE plna_source_id = " + priceListRecId[0] +";"
+            );
+
         } catch (XmlIniFileException e) {
             logger.info("Ошибка при обработке XmlIni-файла", e);
         } catch (FileNameException e) {
@@ -264,7 +278,7 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             logger.info("Ошибка xml-парсера при чтении pom.xml", e);
         }
 
-        logger.info("\nОбработано файлов: " + filesCont[0]);
+
     }
 
     /**
@@ -327,6 +341,9 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 
         // Преобразуем строковое представление уровня логгирования из xml-файла в enum
         Level lvl = Level.getLevel(iniValuesLog.getLevel());
+        if (lvl == null) {
+            lvl = Level.ALL;
+        }
 
         AppenderRef ref = AppenderRef.createAppenderRef("File", lvl, null);
         AppenderRef refConsole = AppenderRef.createAppenderRef("console", lvl, null);

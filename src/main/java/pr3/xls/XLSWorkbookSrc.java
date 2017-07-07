@@ -83,6 +83,10 @@ public class XLSWorkbookSrc extends XLSWorkbook {
 		createStyles();
 	}
 
+	public Integer getPriceListRecId() {
+		return priceListRecId;
+	}
+
 	private void definePriceListParamsFromFileName(String fileNameWithoutExtension) throws XLSWorkbookException {
 
 //		int dashPos = fileNameWithoutExtension.lastIndexOf("-") ;

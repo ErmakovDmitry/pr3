@@ -78,7 +78,12 @@ public class XLSParser {
 			resDb.disconnect();
 			resDb = null;
 		}
+
+
 	}
 
+	public Integer getPriceListRecId() {
+		return srcWb.getPriceListRecId();
+	}
 
 }

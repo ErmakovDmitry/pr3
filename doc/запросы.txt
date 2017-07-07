@@ -13,17 +13,15 @@ WHERE plnas_source_type = "gpermakov_test";
 DELETE FROM DB_GP.plna_sources
 WHERE plnas_source_type = "gpermakov_test";
 
-SELECT * FROM DB_GP.plna_sources
-WHERE plnas_id = 86;
-
 DELETE FROM DB_GP.plna_sources
 WHERE plnas_id = 87;
 
 SELECT * FROM DB_GP.plna_items
 WHERE plna_source_id = 111;
 
-SELECT count(*) FROM DB_GP.plna_items
+SELECT MIN(plna_source_id), count(*)
+FROM DB_GP.plna_items
 WHERE plna_source_id = (
-SELECT MAX(plnas_id) FROM DB_GP.plna_sources
-WHERE plnas_source_type = "gpermakov_test"
+	SELECT MAX(plnas_id) FROM DB_GP.plna_sources
+	WHERE plnas_source_type = "gpermakov_test"
 );
