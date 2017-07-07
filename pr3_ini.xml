@@ -14,18 +14,18 @@
 	</Log>
 	<!-- Source directory with xls-files -->
 	<Src
-		DIR_NAME = "/home/hddraid/TMP/DEMO/"
+		DIR_NAME = "/home/hddraid/TMP/4/"
 		DIR_NAME1 = "C:\Users\Дмитрий\TMP\6\">
 	</Src>
 	<!-- Output xls-file -->
 	<OutXls
 		ENABLED = "true"
-		FILE_NAME = "/home/hddraid/TMP/DEMO/res.xlsx"
+		FILE_NAME = "/home/hddraid/TMP/4/res.xlsx"
 		FILE_NAME1 = "C:\Users\Дмитрий\TMP\6\res.xlsx">
 	</OutXls>
 	<!-- Output database configuration -->
 	<OutDb
-		ENABLED = "true"
+		ENABLED = "false"
 		DRIVER = "com.mysql.jdbc.Driver"
 		URL = "jdbc:mysql://195.42.119.80:4912/DB_GP"
 		USER = "gpermakov"

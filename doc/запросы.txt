@@ -25,3 +25,14 @@ WHERE plna_source_id = (
 	SELECT MAX(plnas_id) FROM DB_GP.plna_sources
 	WHERE plnas_source_type = "gpermakov_test"
 );
+
+DELETE
+FROM DB_GP.plna_items
+WHERE plna_source_id IN (
+	SELECT plnas_id FROM DB_GP.plna_sources
+	WHERE plnas_source_type = "gpermakov_test"
+);
+
+DELETE
+FROM DB_GP.plna_sources
+WHERE plnas_source_type = "gpermakov_test";
