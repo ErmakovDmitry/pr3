@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.zip.Deflater;
 
 import static java.lang.System.exit;
@@ -211,7 +212,7 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
             String srcDirName = iniValues.getIniValuesSrc().getDirName();
 
             // Id записи о прайс-листе в базе
-            final Integer[] priceListRecId = {null};
+            ArrayList<Integer> priceListRecIds = new ArrayList<>();
 
             // Рекурсивный перебор фйайлов в каталоге-источнике
             logger.info("Рекурсивный перебор файлов в каталоге " + srcDirName +" ...");
@@ -249,7 +250,7 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
                     FileName srcFileName = new FileName(path.toString());
                     XLSParser xlsParser = new XLSParser(srcFileName, xlsOutFileName, iniValues);
                     xlsParser.parseFile();
-                    priceListRecId[0] = xlsParser.getPriceListRecId();
+                    priceListRecIds.add(xlsParser.getPriceListRecId());
                 } catch (XLSWorkbookException | SQLException | ClassNotFoundException | FileNameException | IOException e) {
                     logger.info("Файл НЕ обработан, т.к. произошло исключение!", e);
                 }
@@ -261,12 +262,23 @@ LogManager.getLogger(MPLoggingConfiguration.PR3_LOGGER_NAME).debug("qwer");
 
             logger.info("\nОбработано файлов: " + filesCont[0]);
             logger.info("\nРезультат сохранен в файл: " + xlsOutFileName);
-            logger.info("\nЗапрос для получения данных из базы:");
-            logger.info(
-                "SELECT MIN(plna_source_id), count(*)\n" +
-                "FROM DB_GP.plna_items\n" +
-                "WHERE plna_source_id = " + priceListRecId[0] +";"
-            );
+
+            String tmpS = "";
+            for (int priceListRecId : priceListRecIds) {
+                if (tmpS.length() > 0) {
+                    tmpS = tmpS + ",";
+                }
+                tmpS = tmpS + priceListRecId;
+            }
+            if (tmpS.length() > 0) {
+                logger.info("\nЗапрос для получения данных из базы:");
+                logger.info(
+                        "SELECT MIN(plna_source_id), count(*)\n" +
+                                "FROM DB_GP.plna_items\n" +
+                                "WHERE plna_source_id IN (" + tmpS +")\n" +
+                                "GROUP BY plna_source_id;;"
+                );
+            }
 
         } catch (XmlIniFileException e) {
             logger.info("Ошибка при обработке XmlIni-файла", e);
